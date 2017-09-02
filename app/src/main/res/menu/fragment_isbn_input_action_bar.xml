@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <item
+    android:id="@+id/fragment_isbn_input_action_bar_scan"
+    android:title="@string/fragment_add_action_bar_scan_title"
+    app:showAsAction="ifRoom"
+    android:icon="@drawable/ic_barcode_scan"
+    />
+</menu>

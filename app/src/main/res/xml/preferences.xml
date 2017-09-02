@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  >
+
+  <PreferenceScreen
+    android:title="Server settings"
+    android:key="random_key_for_fetching_NEEDED"
+    >
+
+    <PreferenceCategory
+      android:title="@string/preference_server_settings_cat_ip"
+      >
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_remote_url"
+        android:key="preference_server_settings_remote_url"
+        android:title="@string/preference_server_settings_remote_url_title"
+        android:inputType="textWebEditText"
+        android:summary="@string/preference_server_settings_remote_url_summary"
+        android:defaultValue="127.0.0.1"
+        />
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_remote_port"
+        android:key="preference_server_settings_remote_port"
+        android:title="@string/preference_server_settings_remote_port_title"
+        android:inputType="number"
+        android:summary="@string/preference_server_settings_remote_port_summary"
+        android:defaultValue="8080"
+        />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+      android:title="@string/preference_server_settings_cat_endpoint">
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_endpoint_search"
+        android:key="preference_server_settings_endpoint_search"
+        android:title="@string/preference_server_settings_endpoint_search_title"
+        android:inputType="text"
+        android:summary="@string/preference_server_settings_endpoint_search_summary"
+        android:defaultValue="/search"
+        />
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_endpoint_delete"
+        android:key="preference_server_settings_endpoint_delete"
+        android:title="@string/preference_server_settings_endpoint_delete_title"
+        android:inputType="text"
+        android:summary="@string/preference_server_settings_endpoint_delete_summary"
+        android:defaultValue="/delete"
+        />
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_endpoint_add"
+        android:key="preference_server_settings_endpoint_add"
+        android:title="@string/preference_server_settings_endpoint_add_title"
+        android:inputType="text"
+        android:summary="@string/preference_server_settings_endpoint_add_summary"
+        android:defaultValue="/add"
+        />
+
+    </PreferenceCategory>
+
+  </PreferenceScreen>
+
+</PreferenceScreen>

@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
+    defaultConfig {
+        applicationId "me.ialistannen.libraryhelper"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.google.com' }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    // gradle packages transitive dependency from LibraryHelperCommon
+//    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
+
+    // https://github.com/square/okhttp
+
+    compile 'com.android.support:appcompat-v7:26.0.2'
+    compile 'com.android.support:preference-v7:26.0.2'
+    compile 'com.android.support:design:26.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    compile('com.github.I-Al-Istannen:LibaryHelperCommon:b34962ab14')
+
+    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+
+    compile 'com.journeyapps:zxing-android-embedded:3.5.0'
+
+    compile 'com.jakewharton:butterknife:8.8.1'
+    testCompile 'junit:junit:4.12'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+}

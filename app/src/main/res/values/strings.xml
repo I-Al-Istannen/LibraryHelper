@@ -1,0 +1,43 @@
+<resources>
+  <string name="app_name">LibraryHelper</string>
+  <string name="main_activity_action_bar_scan_title">Scan</string>
+  <string name="activity_main_button_add_title">Add</string>
+  <string name="activity_main_button_remove_title">Remove</string>
+  <string name="activity_main_button_search_title">Search</string>
+  <string name="activity_main_button_lend_title">Lend</string>
+  <string name="fragment_add_action_bar_scan_title">Scan</string>
+  <string name="main_activity_action_bar_settings_title">Settings</string>
+
+
+  <string name="preference_server_settings_remote_url_title">Remote server</string>
+  <string name="preference_server_settings_remote_url_summary">The remote server is currently \'%s\'.</string>
+
+  <string name="preference_server_settings_remote_port_title">Remote server port</string>
+  <string name="preference_server_settings_remote_port_summary">The remote server port is currently \'%s\'.</string>
+
+  <string name="preference_server_settings_cat_ip">Server ip Settings</string>
+  <string name="preference_server_settings_cat_endpoint">Endpoint settings</string>
+
+
+  <string name="preference_server_settings_endpoint_search_title">Search endpoint path</string>
+  <string name="preference_server_settings_endpoint_search_summary">The search path on the server is \'%s\'.</string>
+
+  <string name="preference_server_settings_endpoint_delete_title">Delete endpoint path</string>
+  <string name="preference_server_settings_endpoint_delete_summary">The delete path on the server is \'%s\'.</string>
+
+  <string name="preference_server_settings_endpoint_add_title">Add endpoint path</string>
+  <string name="preference_server_settings_endpoint_add_summary">The add path on the server is \'%s\'.</string>
+  <string name="add_fragment_added_book_toast">Successfully added the book</string>
+  <string name="add_fragment_error_adding_book_title">An error occurred adding the book</string>
+  <string name="isbn_input_fragment_error_invalid_isbn">Invalid ISBN!</string>
+  <string name="invalid_isbn">Invalid ISBN!</string>
+  <string name="add_fragment_enter_isbn_hint">ISBN…</string>
+  <string name="isbn_input_fragment_accept_button_title">Accept!</string>
+  <string name="delete_fragment_confirm_tite">Confirm deletion</string>
+  <string name="delete_fragment_confirm_message">Do you really wanna do that?</string>
+  <string name="delete_fragment_confirm_button_no">No</string>
+  <string name="delete_fragment_confirm_button_yes">Yes</string>
+  <string name="delete_fragment_confirm_button_yes_to_all">Yes to all</string>
+  <string name="settings_server_url_not_well_formed">The server url is not well formed.</string>
+  <string name="delete_fragment_error_dleting_book_title">Error deleting a book</string>
+</resources>
