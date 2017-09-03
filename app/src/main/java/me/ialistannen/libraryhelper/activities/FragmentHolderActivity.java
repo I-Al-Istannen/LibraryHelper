@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
+import me.ialistannen.libraryhelper.view.QueryFragment;
 import me.ialistannen.libraryhelper.view.SettingsFragment;
 
 /**
@@ -44,6 +45,9 @@ public class FragmentHolderActivity extends AppCompatActivity {
           break;
         case "DeleteFragment":
           switchToFragment(new DeleteFragment());
+          break;
+        case "QueryFragment":
+          switchToFragment(new QueryFragment());
           break;
         case "SettingsFragment":
           switchToFragment(new SettingsFragment());

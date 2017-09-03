@@ -5,7 +5,7 @@
   <string name="activity_main_button_remove_title">Remove</string>
   <string name="activity_main_button_search_title">Search</string>
   <string name="activity_main_button_lend_title">Lend</string>
-  <string name="fragment_add_action_bar_scan_title">Scan</string>
+  <string name="fragment_isbn_input_action_bar_scan_title">Scan</string>
   <string name="main_activity_action_bar_settings_title">Settings</string>
 
 
@@ -34,10 +34,16 @@
   <string name="add_fragment_enter_isbn_hint">ISBN…</string>
   <string name="isbn_input_fragment_accept_button_title">Accept!</string>
   <string name="delete_fragment_confirm_tite">Confirm deletion</string>
-  <string name="delete_fragment_confirm_message">Do you really wanna do that?</string>
+  <string name="delete_fragment_confirm_message">Do you really want to do that?</string>
   <string name="delete_fragment_confirm_button_no">No</string>
   <string name="delete_fragment_confirm_button_yes">Yes</string>
   <string name="delete_fragment_confirm_button_yes_to_all">Yes to all</string>
   <string name="settings_server_url_not_well_formed">The server url is not well formed.</string>
   <string name="delete_fragment_error_dleting_book_title">Error deleting a book</string>
+  <string name="fragment_query_execute_button_text">Execute!</string>
+  <string name="search_type_isbn_name">Isbn</string>
+  <string name="search_type_title_wildcard_name">Title with Wildcards</string>
+  <string name="search_type_title_regex_name">Title with regular expressions</string>
+  <string name="search_type_author_wildcard_name">Author with Wildcards</string>
+  <string name="fragment_query_input_hint">Query…</string>
 </resources>

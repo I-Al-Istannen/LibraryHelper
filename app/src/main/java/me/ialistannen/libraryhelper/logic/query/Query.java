@@ -1,15 +1,19 @@
 package me.ialistannen.libraryhelper.logic.query;
 
+import android.content.Context;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.Log;
+import com.google.common.base.Function;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import me.ialistannen.isbnlookuplib.util.Consumer;
+import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.util.Json;
 import me.ialistannen.libraryhelpercommon.book.IntermediaryBook;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
@@ -102,7 +106,9 @@ public abstract class Query<T> {
         return;
       }
 
-      withBooks(booksFromJson(body.string()));
+      String string = body.string();
+      System.out.println("Body: " + string);
+      withBooks(booksFromJson(string));
     }
 
     /**
@@ -112,19 +118,39 @@ public abstract class Query<T> {
   }
 
   public enum SearchType {
-    ISBN("isbn"),
-    TITLE_WILDCARD("title_wildcard"),
-    TITLE_REGEX("title_regex"),
-    AUTHOR_WILDCARD("author_wildcard");
+    ISBN("isbn", R.string.search_type_isbn_name),
+    TITLE_WILDCARD("title_wildcard", R.string.search_type_title_wildcard_name),
+    TITLE_REGEX("title_regex", R.string.search_type_title_regex_name),
+    AUTHOR_WILDCARD("author_wildcard", R.string.search_type_author_wildcard_name);
 
     private String value;
+    private final int displayName;
 
-    SearchType(String value) {
+    SearchType(String value, @StringRes int displayName) {
       this.value = value;
+      this.displayName = displayName;
+    }
+
+    public @LayoutRes
+    int getDisplayNameId() {
+      return displayName;
     }
 
     public String getValue() {
       return value;
+    }
+
+    /**
+     * @param context The context to use to resolve {@link #getDisplayNameId()}
+     * @return A function transforming a {@link SearchType} to its display name
+     */
+    public static Function<SearchType, String> transformToDisplayName(final Context context) {
+      return new Function<SearchType, String>() {
+        @Override
+        public String apply(SearchType searchType) {
+          return context.getString(searchType.getDisplayNameId());
+        }
+      };
     }
   }
 }

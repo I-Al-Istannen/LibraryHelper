@@ -8,12 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.ialistannen.libraryhelper.activities.FragmentHolderActivity;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
+import me.ialistannen.libraryhelper.view.QueryFragment;
 import me.ialistannen.libraryhelper.view.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
   @OnClick(R.id.button_accept)
   void onAddClicked() {
-    Toast.makeText(this, "Add clicked", Toast.LENGTH_SHORT).show();
-
     startFragmentActivity(AddFragment.class.getSimpleName());
   }
 
@@ -67,8 +65,11 @@ public class MainActivity extends AppCompatActivity {
 
   @OnClick(R.id.button_remove)
   void onRemoveClicked() {
-    Toast.makeText(this, "Remove clicked", Toast.LENGTH_SHORT).show();
-
     startFragmentActivity(DeleteFragment.class.getSimpleName());
+  }
+
+  @OnClick(R.id.button_search)
+  void onQueryClicked() {
+    startFragmentActivity(QueryFragment.class.getSimpleName());
   }
 }

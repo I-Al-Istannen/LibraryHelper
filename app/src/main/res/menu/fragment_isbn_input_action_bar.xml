@@ -4,7 +4,7 @@
 
   <item
     android:id="@+id/fragment_isbn_input_action_bar_scan"
-    android:title="@string/fragment_add_action_bar_scan_title"
+    android:title="@string/fragment_isbn_input_action_bar_scan_title"
     app:showAsAction="ifRoom"
     android:icon="@drawable/ic_barcode_scan"
     />
