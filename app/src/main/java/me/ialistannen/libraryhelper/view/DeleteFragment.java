@@ -43,7 +43,7 @@ public class DeleteFragment extends IsbnInputFragment {
   }
 
   private void confirmDeletionWithUser(Isbn isbn) {
-    new Builder(getAppCompatActivity())
+    new Builder(getFragmentHolderActivity())
         .setTitle(getString(R.string.delete_fragment_confirm_tite))
         .setMessage(getString(R.string.delete_fragment_confirm_message))
         // hacky way to have three buttons.
@@ -77,7 +77,8 @@ public class DeleteFragment extends IsbnInputFragment {
       public void onClick(DialogInterface dialog, int which) {
         doNotAsk = doNotAskAgain;
         deleteBook(isbn);
-        Toast.makeText(getAppCompatActivity(), "Dek: " + doNotAskAgain, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getFragmentHolderActivity(), "Dek: " + doNotAskAgain, Toast.LENGTH_SHORT)
+            .show();
       }
     };
   }
@@ -86,7 +87,7 @@ public class DeleteFragment extends IsbnInputFragment {
     showWaitingSpinner(true);
     try {
       HttpUrl httpUrl = HttpUtil
-          .getServerUrlFromSettings(getAppCompatActivity(), EndpointType.DELETE)
+          .getServerUrlFromSettings(getFragmentHolderActivity(), EndpointType.DELETE)
           .newBuilder()
           .setQueryParameter("isbn", isbn.getDigitsAsString())
           .build();
@@ -98,7 +99,7 @@ public class DeleteFragment extends IsbnInputFragment {
 
       HttpUtil.getClient().newCall(request).enqueue(new DefaultCallback(this));
     } catch (UrlNotWellFormedException ignored) {
-      HttpUtil.sendDefaultServerUrlNotWellFormed(getAppCompatActivity());
+      HttpUtil.sendDefaultServerUrlNotWellFormed(getFragmentHolderActivity());
     }
   }
 
@@ -107,7 +108,7 @@ public class DeleteFragment extends IsbnInputFragment {
     private Context context;
 
     private DefaultCallback(DeleteFragment fragment) {
-      this.context = fragment.getAppCompatActivity();
+      this.context = fragment.getFragmentHolderActivity();
     }
 
     @Override

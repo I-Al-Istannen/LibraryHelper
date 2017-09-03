@@ -126,7 +126,7 @@ public abstract class IsbnInputFragment extends FragmentBase {
     Optional<Isbn> isbnOptional = isbnConverter.fromString(isbn);
     if (!isbnOptional.isPresent()) {
       Toast.makeText(
-          getAppCompatActivity(),
+          getFragmentHolderActivity(),
           getString(R.string.isbn_input_fragment_error_invalid_isbn),
           Toast.LENGTH_SHORT
       ).show();
@@ -146,12 +146,12 @@ public abstract class IsbnInputFragment extends FragmentBase {
       return;
     }
     if (dialog == null) {
-      dialog = new Dialog(getAppCompatActivity());
+      dialog = new Dialog(getFragmentHolderActivity());
 
       dialog.getWindow().setDimAmount(0.7F);
 
       LayoutParams attributes = dialog.getWindow().getAttributes();
-      ProgressBar progressBar = new ProgressBar(getAppCompatActivity());
+      ProgressBar progressBar = new ProgressBar(getFragmentHolderActivity());
       progressBar.setIndeterminate(true);
 
       dialog.getWindow().addContentView(progressBar, attributes);

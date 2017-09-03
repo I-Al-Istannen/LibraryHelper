@@ -3,6 +3,7 @@ package me.ialistannen.libraryhelper.activities;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
@@ -17,7 +18,6 @@ public class FragmentHolderActivity extends AppCompatActivity {
   public static final String FRAGMENT_EXTRA_KEY = "me.ialistannen.libraryHolder.FragmentHolder.Key";
   private static final String FRAGMENT_TAG = "FragmentHolder";
 
-  private Fragment fragment;
   private boolean actionbarUpPopsFragment;
 
   @Override
@@ -58,6 +58,9 @@ public class FragmentHolderActivity extends AppCompatActivity {
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
+    Fragment fragment = getFragmentManager().findFragmentById(R.id.fragment_container);
+    Log.w("TEST_ME",
+        "Fragment container: " + getFragmentManager().findFragmentById(R.id.fragment_container));
     if (fragment != null) {
       getFragmentManager().putFragment(outState, FRAGMENT_TAG, fragment);
     }
@@ -71,8 +74,6 @@ public class FragmentHolderActivity extends AppCompatActivity {
     getFragmentManager().beginTransaction()
         .replace(R.id.fragment_container, fragment, FRAGMENT_TAG)
         .commit();
-
-    this.fragment = fragment;
   }
 
   /**
@@ -83,8 +84,6 @@ public class FragmentHolderActivity extends AppCompatActivity {
         .replace(R.id.fragment_container, fragment, FRAGMENT_TAG)
         .addToBackStack(FRAGMENT_TAG)
         .commit();
-
-    this.fragment = fragment;
   }
 
   /**
@@ -98,6 +97,7 @@ public class FragmentHolderActivity extends AppCompatActivity {
   public boolean onSupportNavigateUp() {
     if (actionbarUpPopsFragment && getFragmentManager().getBackStackEntryCount() > 0) {
       getFragmentManager().popBackStack();
+
       return true;
     }
     return super.onSupportNavigateUp();

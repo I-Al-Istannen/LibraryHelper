@@ -1,6 +1,6 @@
 package me.ialistannen.libraryhelper.view;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +29,7 @@ import me.ialistannen.libraryhelper.logic.query.Query.SearchType;
 import me.ialistannen.libraryhelper.logic.query.QueryTarget;
 import me.ialistannen.libraryhelper.util.EnumUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil;
+import me.ialistannen.libraryhelper.view.booklist.DisplayBookListFragment;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -59,16 +60,22 @@ public class QueryFragment extends FragmentBase {
     return view;
   }
 
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    getFragmentHolderActivity().setActionbarUpPopsFragment(true);
+  }
+
   private void setupSpinner() {
     Function<SearchType, String> transformation = SearchType
-        .transformToDisplayName(getAppCompatActivity());
+        .transformToDisplayName(getFragmentHolderActivity());
 
     searchTypeMapping = EnumUtil.getReverseMapping(SearchType.class, transformation);
 
     List<String> items = EnumUtil.transformEnum(SearchType.class, transformation);
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(
-        getAppCompatActivity(),
+        getFragmentHolderActivity(),
         android.R.layout.simple_spinner_item,
         items
     );
@@ -130,10 +137,9 @@ public class QueryFragment extends FragmentBase {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            new AlertDialog.Builder(getAppCompatActivity())
-                .setMessage("GOTCHA: " + loanableBooks)
-                .create()
-                .show();
+            DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
+            bookListFragment.addBooks(loanableBooks);
+            getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
           }
         });
       }
@@ -142,7 +148,7 @@ public class QueryFragment extends FragmentBase {
 
   private void performQuery(SearchType searchType, String argument,
       Consumer<List<LoanableBook>> callback) {
-    QueryTarget queryTarget = HttpUtil.getTargetFromSettings(getAppCompatActivity());
+    QueryTarget queryTarget = HttpUtil.getTargetFromSettings(getFragmentHolderActivity());
 
     new MultipleBookQuery(searchType, argument)
         .executeQuery(queryTarget, HttpUtil.getClient(), callback);

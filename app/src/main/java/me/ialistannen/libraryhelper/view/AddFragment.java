@@ -33,7 +33,6 @@ public class AddFragment extends IsbnInputFragment {
   public void onDestroy() {
     showWaitingSpinner(false);
     super.onDestroy();
-    bookAdder.dispose();
   }
 
   @Override
@@ -45,11 +44,11 @@ public class AddFragment extends IsbnInputFragment {
   @Override
   protected void consumeIsbn(Isbn isbn) {
     bookAdder.addBook(
-        getAppCompatActivity(),
+        getFragmentHolderActivity(),
         HttpUtil.getClient(),
         new BookAddCallback() {
 
-          private final Context context = getAppCompatActivity();
+          private final Context context = getFragmentHolderActivity();
 
           @Override
           public void onFailure(@Nullable final IOException e, @Nullable final String error,
@@ -60,21 +59,20 @@ public class AddFragment extends IsbnInputFragment {
               public void run() {
                 hideSpinner();
 
+                String message;
+
                 if (type == ErrorType.IO) {
                   assert e != null;
-                  new AlertDialog.Builder(context)
-                      .setTitle(R.string.add_fragment_error_adding_book_title)
-                      .setMessage(e.getLocalizedMessage())
-                      .create()
-                      .show();
+                  message = e.getLocalizedMessage();
                 } else {
                   assert error != null;
-                  new AlertDialog.Builder(context)
-                      .setTitle(R.string.add_fragment_error_adding_book_title)
-                      .setMessage(error)
-                      .create()
-                      .show();
+                  message = error;
                 }
+                new AlertDialog.Builder(context)
+                    .setTitle(R.string.add_fragment_error_adding_book_title)
+                    .setMessage(message)
+                    .create()
+                    .show();
               }
             });
           }

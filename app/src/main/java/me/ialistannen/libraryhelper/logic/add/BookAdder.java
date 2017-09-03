@@ -3,16 +3,13 @@ package me.ialistannen.libraryhelper.logic.add;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
-import me.ialistannen.isbnlookuplib.util.Consumer;
-import me.ialistannen.isbnlookuplib.util.Optional;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelper.util.Json;
-import me.ialistannen.libraryhelpercommon.book.IntermediaryBook;
-import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -30,8 +27,6 @@ public class BookAdder {
 
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-  private static BookLookupProvider lookupProvider;
-
   /**
    * Adds a book to the server.
    *
@@ -43,29 +38,15 @@ public class BookAdder {
   public void addBook(final Context context, final OkHttpClient client,
       final BookAddCallback callback, Isbn isbn) {
 
-    getLookupProvider().lookup(isbn, new Consumer<Optional<LoanableBook>>() {
-      @Override
-      public void accept(Optional<LoanableBook> loanableBookOptional) {
-        if (!loanableBookOptional.isPresent()) {
-          callback.onFailure(
-              null,
-              "Error fetching book data",
-              ErrorType.ERROR_FETCHING_BOOK_DATA
-          );
-        } else {
-          IntermediaryBook book = IntermediaryBook.fromLoanableBook(loanableBookOptional.get());
-          makeRequest(context, Json.getGson().toJson(book), client, callback);
-        }
-      }
-    });
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty("isbn", isbn.getDigitsAsString());
+    String json = Json.getGson().toJson(jsonObject);
+
+    makeRequest(context, json, client, callback);
   }
 
   private void makeRequest(Context context, final String json, OkHttpClient client,
       final BookAddCallback callback) {
-
-    if (isDisposed()) {
-      return;
-    }
 
     HttpUrl url = HttpUtil.getServerUrlFromSettings(context, EndpointType.ADD);
 
@@ -75,6 +56,8 @@ public class BookAdder {
         .url(url)
         .put(requestBody)
         .build();
+
+    Log.w("TEST_ME", "Request: " + request);
 
     client.newCall(request).enqueue(new Callback() {
       @Override
@@ -128,32 +111,6 @@ public class BookAdder {
     });
   }
 
-  private static synchronized BookLookupProvider getLookupProvider() {
-    if (lookupProvider == null) {
-      lookupProvider = new BookLookupProvider();
-    }
-    return lookupProvider;
-  }
-
-  /**
-   * Releases all static resources.
-   */
-  public void dispose() {
-    if (lookupProvider != null) {
-      lookupProvider.dispose();
-      lookupProvider = null;
-    }
-  }
-
-  /**
-   * <b>Is only accurate after an isbn lookup was made!</b>
-   *
-   * @return True if this adder was disposed.
-   */
-  private boolean isDisposed() {
-    return lookupProvider == null;
-  }
-
   public interface BookAddCallback {
 
     /**
@@ -172,7 +129,6 @@ public class BookAdder {
   }
 
   public enum ErrorType {
-    ERROR_FETCHING_BOOK_DATA,
     IO,
     NOT_ACKNOWLEDGED,
     RESPONSE_MALFORMED

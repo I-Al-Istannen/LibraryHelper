@@ -1,9 +1,10 @@
 package me.ialistannen.libraryhelper.view;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import me.ialistannen.libraryhelper.activities.FragmentHolderActivity;
 
 /**
  * A base class for fragments.
@@ -16,7 +17,15 @@ public class FragmentBase extends Fragment {
     setRetainInstance(true);
   }
 
-  protected AppCompatActivity getAppCompatActivity() {
-    return (AppCompatActivity) getActivity();
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    if (!(context instanceof FragmentHolderActivity)) {
+      throw new IllegalArgumentException("Can only attach to FragmentHolderActivitys");
+    }
+  }
+
+  protected FragmentHolderActivity getFragmentHolderActivity() {
+    return (FragmentHolderActivity) getActivity();
   }
 }
