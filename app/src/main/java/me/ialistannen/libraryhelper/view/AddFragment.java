@@ -13,7 +13,7 @@ import me.ialistannen.isbnlookuplib.isbn.Isbn;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.add.BookAdder;
 import me.ialistannen.libraryhelper.logic.add.BookAdder.BookAddCallback;
-import me.ialistannen.libraryhelper.logic.add.BookAdder.ErrorType;
+import me.ialistannen.libraryhelper.logic.server.ServerResponseErrorType;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 
 /**
@@ -52,7 +52,7 @@ public class AddFragment extends IsbnInputFragment {
 
           @Override
           public void onFailure(@Nullable final IOException e, @Nullable final String error,
-              @NonNull final ErrorType type) {
+              @NonNull final ServerResponseErrorType type) {
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
               @Override
@@ -61,7 +61,7 @@ public class AddFragment extends IsbnInputFragment {
 
                 String message;
 
-                if (type == ErrorType.IO) {
+                if (type == ServerResponseErrorType.IO) {
                   assert e != null;
                   message = e.getLocalizedMessage();
                 } else {

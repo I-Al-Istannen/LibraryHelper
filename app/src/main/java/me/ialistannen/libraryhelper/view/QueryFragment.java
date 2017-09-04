@@ -1,5 +1,6 @@
 package me.ialistannen.libraryhelper.view;
 
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import butterknife.BindView;
@@ -20,13 +22,15 @@ import butterknife.OnClick;
 import com.google.common.base.Function;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import me.ialistannen.isbnlookuplib.util.Consumer;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.query.MultipleBookQuery;
+import me.ialistannen.libraryhelper.logic.query.Query.QueryCallback;
 import me.ialistannen.libraryhelper.logic.query.Query.SearchType;
 import me.ialistannen.libraryhelper.logic.query.QueryTarget;
+import me.ialistannen.libraryhelper.logic.server.ServerResponseErrorType;
 import me.ialistannen.libraryhelper.util.EnumUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.view.booklist.DisplayBookListFragment;
@@ -42,6 +46,9 @@ public class QueryFragment extends FragmentBase {
 
   @BindView(R.id.query_input)
   EditText queryInput;
+
+  @BindView(R.id.execute_query_button)
+  Button executeButton;
 
   private Map<String, SearchType> searchTypeMapping;
 
@@ -130,27 +137,62 @@ public class QueryFragment extends FragmentBase {
     performQuery(SearchType.ISBN, isbnString, getDefaultCallback());
   }
 
-  private Consumer<List<LoanableBook>> getDefaultCallback() {
-    return new Consumer<List<LoanableBook>>() {
+  private QueryCallback<List<LoanableBook>> getDefaultCallback() {
+    return new QueryCallback<List<LoanableBook>>() {
       @Override
-      public void accept(final List<LoanableBook> loanableBooks) {
+      public void onError(IOException exception, String error, ServerResponseErrorType type) {
+        if (!isAdded()) {
+          return;
+        }
+
+        final String message;
+        if (type == ServerResponseErrorType.IO) {
+          message = exception.getLocalizedMessage();
+        } else {
+          message = error;
+        }
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
+            executeButton.setEnabled(true);
+
+            new Builder(getFragmentHolderActivity())
+                .setTitle(getString(R.string.query_fragment_error_querying_server_title))
+                .setMessage(message)
+                .create()
+                .show();
+          }
+        });
+      }
+
+      @Override
+      public void onSuccess(final List<LoanableBook> books) {
+        if (!isAdded()) {
+          return;
+        }
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+          @Override
+          public void run() {
+            executeButton.setEnabled(true);
+
             DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
-            bookListFragment.addBooks(loanableBooks);
+            bookListFragment.addBooks(books);
             getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
           }
         });
+
       }
     };
   }
 
   private void performQuery(SearchType searchType, String argument,
-      Consumer<List<LoanableBook>> callback) {
+      QueryCallback<List<LoanableBook>> callback) {
     QueryTarget queryTarget = HttpUtil.getTargetFromSettings(getFragmentHolderActivity());
 
     new MultipleBookQuery(searchType, argument)
         .executeQuery(queryTarget, HttpUtil.getClient(), callback);
+    executeButton.setEnabled(false);
   }
 }

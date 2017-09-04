@@ -162,7 +162,7 @@ public class DeleteFragment extends IsbnInputFragment {
         @Override
         public void run() {
           new AlertDialog.Builder(context)
-              .setTitle(R.string.delete_fragment_error_dleting_book_title)
+              .setTitle(R.string.delete_fragment_error_deleting_book_title)
               .setMessage(message)
               .create()
               .show();

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
+import me.ialistannen.libraryhelper.logic.server.ServerResponseErrorType;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelper.util.Json;
@@ -62,14 +63,15 @@ public class BookAdder {
     client.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(@NonNull Call call, @NonNull IOException e) {
-        callback.onFailure(e, null, ErrorType.IO);
+        callback.onFailure(e, null, ServerResponseErrorType.IO);
       }
 
       @Override
       public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
         ResponseBody body = response.body();
         if (body == null) {
-          callback.onFailure(null, "Unknown, got no body.", ErrorType.RESPONSE_MALFORMED);
+          callback
+              .onFailure(null, "Unknown, got no body.", ServerResponseErrorType.RESPONSE_MALFORMED);
           return;
         }
 
@@ -78,7 +80,7 @@ public class BookAdder {
 
         if (jsonObject == null) {
           callback.onFailure(null, "Not a valid json object: " + bodyString,
-              ErrorType.RESPONSE_MALFORMED);
+              ServerResponseErrorType.RESPONSE_MALFORMED);
           return;
         }
 
@@ -89,7 +91,7 @@ public class BookAdder {
           } else {
             message = "Unknown body received: " + bodyString;
           }
-          callback.onFailure(null, message, ErrorType.RESPONSE_MALFORMED);
+          callback.onFailure(null, message, ServerResponseErrorType.GENERIC_ERROR);
           return;
         }
 
@@ -97,7 +99,7 @@ public class BookAdder {
           callback.onFailure(
               null,
               "Not acknowledged but no error...",
-              ErrorType.RESPONSE_MALFORMED
+              ServerResponseErrorType.RESPONSE_MALFORMED
           );
           return;
         }
@@ -105,7 +107,7 @@ public class BookAdder {
         if (jsonObject.getAsJsonPrimitive("acknowledged").getAsBoolean()) {
           callback.onSuccess();
         } else {
-          callback.onFailure(null, "Not acknowledged", ErrorType.NOT_ACKNOWLEDGED);
+          callback.onFailure(null, "Not acknowledged", ServerResponseErrorType.NOT_ACKNOWLEDGED);
         }
       }
     });
@@ -120,7 +122,8 @@ public class BookAdder {
      * @param error The logical error, stating what is wrong with your data
      * @param type The type of the erro
      */
-    void onFailure(@Nullable IOException e, @Nullable String error, @NonNull ErrorType type);
+    void onFailure(@Nullable IOException e, @Nullable String error,
+        @NonNull ServerResponseErrorType type);
 
     /**
      * Called when a book was successfully added.
@@ -128,9 +131,4 @@ public class BookAdder {
     void onSuccess();
   }
 
-  public enum ErrorType {
-    IO,
-    NOT_ACKNOWLEDGED,
-    RESPONSE_MALFORMED
-  }
 }

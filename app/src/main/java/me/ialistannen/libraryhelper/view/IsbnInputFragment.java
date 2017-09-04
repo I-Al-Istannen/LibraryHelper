@@ -127,7 +127,7 @@ public abstract class IsbnInputFragment extends FragmentBase {
     if (!isbnOptional.isPresent()) {
       Toast.makeText(
           getFragmentHolderActivity(),
-          getString(R.string.isbn_input_fragment_error_invalid_isbn),
+          getString(R.string.invalid_isbn),
           Toast.LENGTH_SHORT
       ).show();
       return;

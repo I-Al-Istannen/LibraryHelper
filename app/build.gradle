@@ -42,9 +42,10 @@ dependencies {
     compile 'com.android.support:design:26.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile('com.github.I-Al-Istannen:LibaryHelperCommon:b34962ab14')
+    compile('com.github.I-Al-Istannen:LibaryHelperCommon:037ace4c01')
 
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile 'com.journeyapps:zxing-android-embedded:3.5.0'
 

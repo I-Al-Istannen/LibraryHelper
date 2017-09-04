@@ -11,7 +11,7 @@
     android:id="@+id/cover_image_view"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_weight="0.3"
+    android:layout_weight="0.2"
     app:srcCompat="@mipmap/ic_launcher"
     />
 
@@ -19,7 +19,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:gravity="center_vertical"
+    android:gravity="center"
 
     android:minHeight="45dp"
     android:orientation="vertical"
@@ -27,11 +27,12 @@
 
     <TextView
       android:id="@+id/title_text_view"
+      android:textStyle="bold"
+
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-
       android:text="@string/lorem_ipsum_dolor_sit_amet"
-      />
+      android:textAllCaps="false"/>
 
     <View
       android:id="@+id/separator"

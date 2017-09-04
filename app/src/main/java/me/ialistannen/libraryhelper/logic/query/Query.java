@@ -1,7 +1,6 @@
 package me.ialistannen.libraryhelper.logic.query;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.util.Log;
@@ -12,8 +11,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import me.ialistannen.isbnlookuplib.util.Consumer;
 import me.ialistannen.libraryhelper.R;
+import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
+import me.ialistannen.libraryhelper.logic.server.ServerResponseErrorType;
 import me.ialistannen.libraryhelper.util.Json;
 import me.ialistannen.libraryhelpercommon.book.IntermediaryBook;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
@@ -37,7 +37,8 @@ public abstract class Query<T> {
    * @param target The target
    * @param callback The callback to handle the result of the query.
    */
-  public abstract void executeQuery(QueryTarget target, OkHttpClient client, Consumer<T> callback);
+  public abstract void executeQuery(QueryTarget target, OkHttpClient client,
+      QueryCallback<T> callback);
 
   /**
    * @param target The target of the query
@@ -80,41 +81,77 @@ public abstract class Query<T> {
     return results;
   }
 
-  protected abstract static class DefaultCallback<T> implements Callback {
+  protected static class DefaultCallback implements Callback {
 
-    private Consumer<T> callback;
-    private T emptyResponse;
+    private QueryCallback<List<LoanableBook>> callback;
 
-    DefaultCallback(Consumer<T> callback, T emptyResponse) {
+    DefaultCallback(QueryCallback<List<LoanableBook>> callback) {
       this.callback = callback;
-      this.emptyResponse = emptyResponse;
     }
 
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-      Log.w("MyThingyBook", "Failure!", e);
-      callback.accept(emptyResponse);
+      Log.w("Query", "Failure!", e);
+      callback.onError(e, null, ServerResponseErrorType.IO);
     }
 
     @Override
     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
       ResponseBody body = response.body();
 
-      if (!response.isSuccessful() || body == null) {
-        Log.w("MyThingyBook", "Not successful: " + response.isSuccessful() + " " + (body == null));
-        callback.accept(emptyResponse);
+      if (body == null) {
+        callback.onError(null, "Body is null", ServerResponseErrorType.RESPONSE_MALFORMED);
         return;
       }
 
-      String string = body.string();
-      System.out.println("Body: " + string);
-      withBooks(booksFromJson(string));
+      String bodyString = body.string();
+
+      if (!response.isSuccessful()) {
+        ApiErrorPOJO error = Json.getGson().fromJson(bodyString, ApiErrorPOJO.class);
+        if (error == null) {
+          callback.onError(
+              null,
+              "Response malformed: '" + bodyString + "'",
+              ServerResponseErrorType.RESPONSE_MALFORMED
+          );
+          return;
+        }
+        callback.onError(null, error.message, ServerResponseErrorType.GENERIC_ERROR);
+        return;
+      }
+
+      List<LoanableBook> books = booksFromJson(bodyString);
+
+      if (books == null) {
+        callback.onError(
+            null,
+            "Json malformed: '" + bodyString + "'",
+            ServerResponseErrorType.RESPONSE_MALFORMED
+        );
+        return;
+      }
+      callback.onSuccess(books);
     }
+  }
+
+  public interface QueryCallback<T> {
 
     /**
-     * @param books The books the server returned
+     * Called when a book could not be looked up.
+     *
+     * @param exception The exception, if any
+     * @param error The logical error, stating what is wrong with your data
+     * @param type The type of the error
      */
-    protected abstract void withBooks(List<LoanableBook> books);
+    void onError(IOException exception, String error, ServerResponseErrorType type);
+
+    /**
+     * Called when a book was successfully added.
+     *
+     * @param value The response
+     */
+    void onSuccess(T value);
+
   }
 
   public enum SearchType {
@@ -131,7 +168,7 @@ public abstract class Query<T> {
       this.displayName = displayName;
     }
 
-    public @LayoutRes
+    public @StringRes
     int getDisplayNameId() {
       return displayName;
     }

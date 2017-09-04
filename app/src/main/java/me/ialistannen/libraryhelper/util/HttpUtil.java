@@ -96,7 +96,8 @@ public class HttpUtil {
   public enum EndpointType {
     SEARCH("search"),
     ADD("add"),
-    DELETE("delete");
+    DELETE("delete"),
+    COVER("cover");
 
     private final String preferenceKey;
 

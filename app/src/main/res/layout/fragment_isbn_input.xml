@@ -28,7 +28,7 @@
       android:id="@+id/isbn_edit_text"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:hint="@string/add_fragment_enter_isbn_hint"/>
+      android:hint="@string/isbn_input_fragment_enter_isbn_hint"/>
 
   </me.ialistannen.libraryhelper.view.input.isbninputlayout.IsbnInputTextLayout>
 

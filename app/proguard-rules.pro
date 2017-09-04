@@ -49,4 +49,9 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn javax.annotation.**
-##---------------End: proguard configuration for OKHTTP----------
+##---------------End: proguard configuration for OKHTTP    ----------
+
+
+##---------------Begin: proguard configuration for PICASSO  ----------
+-dontwarn com.squareup.okhttp.**
+##---------------End: proguard configuration for PICASSO    ----------
