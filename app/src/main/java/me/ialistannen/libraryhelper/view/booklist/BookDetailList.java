@@ -3,9 +3,13 @@ package me.ialistannen.libraryhelper.view.booklist;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,17 +49,34 @@ public class BookDetailList extends RecyclerView {
   private void init() {
     setLayoutManager(new LinearLayoutManager(getContext()));
     setAdapter(new BookDetailAdapter());
+    setNestedScrollingEnabled(false);
 
     addItemDecoration(new ItemDecoration() {
+      private int spacingTop = dpToPixels(18);
+      private int spacingSides = dpToPixels(8);
+
+      private int dpToPixels(int dp) {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
+      }
+
       @Override
       public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
         super.getItemOffsets(outRect, view, parent, state);
         if (getChildAdapterPosition(view) != 0) {
-          outRect.top = 25;
+          outRect.top = spacingTop;
         }
-        outRect.bottom = 25;
+        outRect.bottom = spacingTop;
+        outRect.left = spacingSides;
+        outRect.right = spacingSides;
       }
     });
+    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
+        DividerItemDecoration.VERTICAL);
+    dividerItemDecoration.setDrawable(
+        ContextCompat.getDrawable(getContext(), R.drawable.highlighted_divider_horizontal)
+    );
+    addItemDecoration(dividerItemDecoration);
   }
 
   /**

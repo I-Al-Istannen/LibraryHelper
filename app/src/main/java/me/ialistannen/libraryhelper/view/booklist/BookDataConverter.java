@@ -31,6 +31,7 @@ class BookDataConverter {
     addConverter(StandardBookDataKeys.ISBN.name(), new IsbnConverter());
     addConverter(StandardBookDataKeys.PRICE.name(), new PriceConverter());
     addConverter(StandardBookDataKeys.AUTHORS.name(), new AuthorConverter());
+    addConverter(StandardBookDataKeys.RATING.name(), new PercentageConverter());
 
     blacklistedKeys.add(StandardBookDataKeys.ISBN_STRING);
     blacklistedKeys.add(StandardBookDataKeys.COVER_IMAGE_URL);
@@ -143,7 +144,17 @@ class BookDataConverter {
             .append("\n");
       }
 
+      result.replace(result.length() - 1, result.length(), "");
+
       return result.toString();
+    }
+  }
+
+  private static class PercentageConverter implements Function<Double, String> {
+
+    @Override
+    public String apply(Double percentage) {
+      return NumberFormat.getPercentInstance().format(percentage);
     }
   }
 }

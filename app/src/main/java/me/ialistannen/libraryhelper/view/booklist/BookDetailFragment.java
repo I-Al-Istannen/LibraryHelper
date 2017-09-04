@@ -79,6 +79,6 @@ public class BookDetailFragment extends FragmentBase {
     return HttpUtil.getServerUrlFromSettings(getFragmentHolderActivity(), EndpointType.COVER)
         .url()
         .toExternalForm()
-        + "/" + isbn.getDigitsAsString();
+        + "/" + isbn.getDigitsAsString() + ".jpg";
   }
 }
