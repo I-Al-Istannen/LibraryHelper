@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
@@ -34,6 +35,8 @@ public class DetailBookRecyclerList extends RecyclerView {
   {
     init();
   }
+
+  private View emptyView;
 
   public DetailBookRecyclerList(Context context) {
     super(context);
@@ -65,10 +68,34 @@ public class DetailBookRecyclerList extends RecyclerView {
   }
 
   /**
+   * Sets the id of the view to be made visible when the list is empty.
+   *
+   * <p><br><strong>Must be invoked before calling {@link #setBooks(Collection)} to hide the view
+   * correctly.</strong>
+   *
+   * @param emptyView The id of the view to display when the list is empty.
+   */
+  void setEmptyView(View emptyView) {
+    this.emptyView = emptyView;
+  }
+
+  /**
    * @param books The {@link LoanableBook}s to add
    */
-  void addBooks(Iterable<LoanableBook> books) {
-    ((BookAdapter) getAdapter()).addBooks(books);
+  void setBooks(Collection<LoanableBook> books) {
+    ((BookAdapter) getAdapter()).setBooks(books);
+    System.out.println(emptyView);
+    if (emptyView == null) {
+      return;
+    }
+
+    if (books.isEmpty()) {
+      emptyView.setVisibility(VISIBLE);
+      setVisibility(GONE);
+    } else {
+      emptyView.setVisibility(GONE);
+      setVisibility(VISIBLE);
+    }
   }
 
   @Override
@@ -103,10 +130,10 @@ public class DetailBookRecyclerList extends RecyclerView {
      *
      * @param books The {@link LoanableBook}s to add
      */
-    private void addBooks(Iterable<LoanableBook> books) {
-      for (LoanableBook loanableBook : books) {
-        data.add(loanableBook);
-      }
+    private void setBooks(Collection<LoanableBook> books) {
+      data.clear();
+      data.addAll(books);
+
       notifyDataSetChanged();
     }
   }

@@ -31,7 +31,8 @@ public class DisplayBookListFragment extends FragmentBase {
 
     ButterKnife.bind(this, view);
 
-    recyclerView.addBooks(booksToAdd);
+    recyclerView.setEmptyView(view.findViewById(R.id.empty_view));
+    recyclerView.setBooks(booksToAdd);
     booksToAdd.clear();
 
     return view;

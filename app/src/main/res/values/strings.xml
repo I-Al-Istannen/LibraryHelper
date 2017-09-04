@@ -57,4 +57,5 @@
   <string name="settings_server_url_not_well_formed">The server url is not well formed.</string>
   <string name="lorem_ipsum_dolor_sit_amet">Lorem Ipsum, dolor sit amet.</string>
   <string name="query_fragment_error_querying_server_title">Error performing query</string>
+  <string name="empty_view">This list is empty.</string>
 </resources>
