@@ -1,6 +1,8 @@
 package me.ialistannen.libraryhelper.view.booklist;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.view.FragmentBase;
+import me.ialistannen.libraryhelper.view.booklist.LoanableBookRecyclerList.ClickListener;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -19,9 +22,9 @@ public class DisplayBookListFragment extends FragmentBase {
 
 
   @BindView(R.id.book_list)
-  DetailBookRecyclerList recyclerView;
+  LoanableBookRecyclerList recyclerView;
 
-  private List<LoanableBook> booksToAdd = new ArrayList<>();
+  private List<LoanableBook> books = new ArrayList<>();
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,17 +35,30 @@ public class DisplayBookListFragment extends FragmentBase {
     ButterKnife.bind(this, view);
 
     recyclerView.setEmptyView(view.findViewById(R.id.empty_view));
-    recyclerView.setBooks(booksToAdd);
-    booksToAdd.clear();
+    recyclerView.setBooks(books);
+    recyclerView.setClickListener(new ClickListener() {
+      @Override
+      public void onClick(RecyclerView view, LoanableBook item, int index) {
+        BookDetailFragment bookDetailFragment = new BookDetailFragment();
+        bookDetailFragment.setBook(item);
+        getFragmentHolderActivity().switchToFragmentPushBack(bookDetailFragment);
+      }
+    });
 
     return view;
+  }
+
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    getFragmentHolderActivity().setActionbarUpPopsFragment(true);
   }
 
   /**
    * @param books The {@link LoanableBook}s to add to this fragment
    */
-  public void addBooks(List<LoanableBook> books) {
-    booksToAdd.addAll(books);
+  public void setBooks(List<LoanableBook> books) {
+    this.books.addAll(books);
   }
 
 }

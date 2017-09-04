@@ -29,7 +29,7 @@ import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 /**
  * A {@link RecyclerView} to display {@link LoanableBook}s.
  */
-public class DetailBookRecyclerList extends RecyclerView {
+public class LoanableBookRecyclerList extends RecyclerView {
 
   // No real control over the constructors, so call for each
   {
@@ -37,17 +37,18 @@ public class DetailBookRecyclerList extends RecyclerView {
   }
 
   private View emptyView;
+  private ClickListener clickListener;
 
-  public DetailBookRecyclerList(Context context) {
+  public LoanableBookRecyclerList(Context context) {
     super(context);
   }
 
-  public DetailBookRecyclerList(Context context,
+  public LoanableBookRecyclerList(Context context,
       @Nullable AttributeSet attrs) {
     super(context, attrs);
   }
 
-  public DetailBookRecyclerList(Context context, @Nullable AttributeSet attrs, int defStyle) {
+  public LoanableBookRecyclerList(Context context, @Nullable AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
   }
 
@@ -79,12 +80,15 @@ public class DetailBookRecyclerList extends RecyclerView {
     this.emptyView = emptyView;
   }
 
+  void setClickListener(ClickListener clickListener) {
+    this.clickListener = clickListener;
+  }
+
   /**
    * @param books The {@link LoanableBook}s to add
    */
   void setBooks(Collection<LoanableBook> books) {
     ((BookAdapter) getAdapter()).setBooks(books);
-    System.out.println(emptyView);
     if (emptyView == null) {
       return;
     }
@@ -103,7 +107,7 @@ public class DetailBookRecyclerList extends RecyclerView {
     super.onAttachedToWindow();
   }
 
-  private static class BookAdapter extends Adapter {
+  private class BookAdapter extends Adapter {
 
     private List<LoanableBook> data = new ArrayList<>();
 
@@ -117,7 +121,23 @@ public class DetailBookRecyclerList extends RecyclerView {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-      ((BookViewHolder) holder).setBook(data.get(position));
+      final BookViewHolder bookViewHolder = (BookViewHolder) holder;
+      bookViewHolder.setBook(data.get(position));
+
+      if (clickListener == null) {
+        return;
+      }
+
+      bookViewHolder.getRootLayout().setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          clickListener.onClick(
+              LoanableBookRecyclerList.this,
+              data.get(getChildAdapterPosition(bookViewHolder.getRootLayout())),
+              getChildAdapterPosition(bookViewHolder.getRootLayout())
+          );
+        }
+      });
     }
 
     @Override
@@ -157,6 +177,10 @@ public class DetailBookRecyclerList extends RecyclerView {
       ButterKnife.bind(this, itemView);
     }
 
+    private View getRootLayout() {
+      return itemView.findViewById(R.id.display_book_list_item_root);
+    }
+
     private void setBook(LoanableBook book) {
       imageLoaded = false;
       title.setText(book.getData(StandardBookDataKeys.TITLE).toString());
@@ -188,5 +212,15 @@ public class DetailBookRecyclerList extends RecyclerView {
         }
       });
     }
+  }
+
+  public interface ClickListener {
+
+    /**
+     * @param view This view
+     * @param item The item that was clicked
+     * @param index The index it is in the adapter
+     */
+    void onClick(RecyclerView view, LoanableBook item, int index);
   }
 }

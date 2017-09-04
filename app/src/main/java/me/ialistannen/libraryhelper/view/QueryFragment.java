@@ -178,7 +178,7 @@ public class QueryFragment extends FragmentBase {
             executeButton.setEnabled(true);
 
             DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
-            bookListFragment.addBooks(books);
+            bookListFragment.setBooks(books);
             getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
           }
         });

@@ -87,7 +87,8 @@ public class FragmentHolderActivity extends AppCompatActivity {
   }
 
   /**
-   * @param actionbarUpPopsFragment If true the action bar up button pops back a fragment
+   * @param actionbarUpPopsFragment If true the action bar up button pops back a fragment instead of
+   * exiting the activity
    */
   public void setActionbarUpPopsFragment(boolean actionbarUpPopsFragment) {
     this.actionbarUpPopsFragment = actionbarUpPopsFragment;

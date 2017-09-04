@@ -58,4 +58,15 @@
   <string name="lorem_ipsum_dolor_sit_amet">Lorem Ipsum, dolor sit amet.</string>
   <string name="query_fragment_error_querying_server_title">Error performing query</string>
   <string name="empty_view">This list is empty.</string>
+  <string name="content_description_book_cover_image">Cover image</string>
+
+  <string name="book_data_key_publisher_name">Publisher</string>
+  <string name="book_data_key_url_name">Url</string>
+  <string name="book_data_key_title_name">Title</string>
+  <string name="book_data_key_isbn_name">Isbn</string>
+  <string name="book_data_key_description_name">Description</string>
+  <string name="book_data_key_rating_name">Rating</string>
+  <string name="book_data_key_language_name">Language</string>
+  <string name="book_data_key_authors_name">Authors</string>
+  <string name="book_data_key_price_name">Price</string>
 </resources>
