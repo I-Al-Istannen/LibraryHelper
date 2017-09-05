@@ -8,6 +8,7 @@ import android.support.annotation.StringRes;
 import android.widget.Toast;
 import java.io.IOException;
 import me.ialistannen.libraryhelper.R;
+import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
 import me.ialistannen.libraryhelper.view.FragmentBase;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -33,6 +34,7 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
   @Override
   public void onFailure(@NonNull Call call, @NonNull IOException e) {
     showDialog(e.getLocalizedMessage());
+    onPostExecute();
   }
 
   @Override
@@ -50,7 +52,20 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
     }
 
     String bodyString = body.string();
-    T result = Json.getGson().fromJson(bodyString, pojo);
+
+    if (!response.isSuccessful()) {
+      ApiErrorPOJO error = Json.fromJson(bodyString, ApiErrorPOJO.class);
+      if (error == null) {
+        showDialog(R.string.server_response_malformed, bodyString);
+        onPostExecute();
+        return;
+      }
+      showDialog(R.string.server_response_error_received, error.message);
+      onPostExecute();
+      return;
+    }
+
+    T result = Json.fromJson(bodyString, pojo);
 
     if (result == null) {
       showDialog(R.string.server_response_malformed, bodyString);

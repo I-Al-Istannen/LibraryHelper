@@ -5,11 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.util.Log;
 import com.google.common.base.Function;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
@@ -58,10 +58,6 @@ public abstract class Query<T> {
         .build();
   }
 
-  private static Gson getGson() {
-    return Json.getGson();
-  }
-
   /**
    * @param json The json response
    * @return A list with {@link LoanableBook}s
@@ -70,7 +66,11 @@ public abstract class Query<T> {
     //@formatter:off
     Type type = new TypeToken<List<IntermediaryBook>>() {}.getType();
     //@formatter:on
-    List<IntermediaryBook> books = getGson().fromJson(json, type);
+    List<IntermediaryBook> books = Json.fromJson(json, type);
+
+    if (books == null) {
+      return Collections.emptyList();
+    }
 
     List<LoanableBook> results = new ArrayList<>(books.size());
 
@@ -107,7 +107,7 @@ public abstract class Query<T> {
       String bodyString = body.string();
 
       if (!response.isSuccessful()) {
-        ApiErrorPOJO error = Json.getGson().fromJson(bodyString, ApiErrorPOJO.class);
+        ApiErrorPOJO error = Json.fromJson(bodyString, ApiErrorPOJO.class);
         if (error == null) {
           callback.onError(
               null,

@@ -18,12 +18,14 @@ public class JsonExtractingServerCallback extends BasicFragmentServerCallback<Js
   /**
    * @param context The context to use
    * @param jsonKey The key in the returned json
+   * @param title The message to use as the dialog title
    * @param successToast The message to toast if it was successful
    * @param failureDialog The dialog message to show it was unsuccessful
    */
   public JsonExtractingServerCallback(FragmentBase context, String jsonKey,
+      @StringRes int title,
       @StringRes int successToast, @StringRes int failureDialog) {
-    super(context, R.string.lend_fragment_error_lending_book, JsonObject.class);
+    super(context, title, JsonObject.class);
     this.jsonKey = jsonKey;
     this.successTost = successToast;
     this.failureDialog = failureDialog;

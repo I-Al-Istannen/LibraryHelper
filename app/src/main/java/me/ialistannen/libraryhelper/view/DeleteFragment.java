@@ -1,30 +1,17 @@
 package me.ialistannen.libraryhelper.view;
 
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.widget.Toast;
-import com.google.gson.JsonObject;
-import java.io.IOException;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
 import me.ialistannen.libraryhelper.R;
-import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
-import me.ialistannen.libraryhelper.util.Json;
+import me.ialistannen.libraryhelper.util.JsonExtractingServerCallback;
 import me.ialistannen.libraryhelper.util.UrlNotWellFormedException;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * Deletes a book from the server.
@@ -77,8 +64,6 @@ public class DeleteFragment extends IsbnInputFragment {
       public void onClick(DialogInterface dialog, int which) {
         doNotAsk = doNotAskAgain;
         deleteBook(isbn);
-        Toast.makeText(getFragmentHolderActivity(), "Dek: " + doNotAskAgain, Toast.LENGTH_SHORT)
-            .show();
       }
     };
   }
@@ -97,88 +82,22 @@ public class DeleteFragment extends IsbnInputFragment {
           .delete()
           .build();
 
-      HttpUtil.getClient().newCall(request).enqueue(new DefaultCallback(this));
-    } catch (UrlNotWellFormedException ignored) {
-      HttpUtil.sendDefaultServerUrlNotWellFormed(getFragmentHolderActivity());
-    }
-  }
-
-  private class DefaultCallback implements Callback {
-
-    private Context context;
-
-    private DefaultCallback(DeleteFragment fragment) {
-      this.context = fragment.getFragmentHolderActivity();
-    }
-
-    @Override
-    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-      showDialog(e.getLocalizedMessage());
-    }
-
-    @Override
-    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-      showWaitingSpinner(false);
-      ResponseBody body = response.body();
-      if (body == null) {
-        showDialog("Unknown, got no body.");
-        return;
-      }
-
-      String bodyString = body.string();
-      JsonObject jsonObject = Json.getGson().fromJson(bodyString, JsonObject.class);
-
-      if (jsonObject == null) {
-        showDialog("Not a valid json object: '" + bodyString + "'");
-        return;
-      }
-
-      if (!response.isSuccessful()) {
-        ApiErrorPOJO error = Json.getGson().fromJson(bodyString, ApiErrorPOJO.class);
-        showDialog(error.message == null ? "Unknown" : error.message);
-        return;
-      }
-
-      DeletePojo deletePojo = Json.getGson().fromJson(bodyString, DeletePojo.class);
-
-      if (deletePojo.deleted) {
-        doSyncIfAdded(new Runnable() {
-          @Override
-          public void run() {
-            Toast.makeText(
-                context,
-                getString(R.string.delete_fragment_book_deleted),
-                Toast.LENGTH_SHORT
-            ).show();
+      HttpUtil.getClient().newCall(request).enqueue(
+          new JsonExtractingServerCallback(
+              this, "deleted",
+              R.string.delete_fragment_error_deleting_book_title,
+              R.string.delete_fragment_book_deleted,
+              R.string.delete_fragment_server_refused_deletion
+          ) {
+            @Override
+            protected void onPostExecute() {
+              showWaitingSpinner(false);
+            }
           }
-        });
-      } else {
-        showDialog(getString(R.string.delete_fragment_server_refused_deletion));
-      }
-    }
-
-    private void showDialog(final String message) {
-      doSyncIfAdded(new Runnable() {
-        @Override
-        public void run() {
-          new AlertDialog.Builder(context)
-              .setTitle(R.string.delete_fragment_error_deleting_book_title)
-              .setMessage(message)
-              .create()
-              .show();
-        }
-      });
-    }
-
-    private void doSyncIfAdded(Runnable runnable) {
-      if (!isAdded()) {
-        return;
-      }
-      new Handler(Looper.getMainLooper()).post(runnable);
-    }
-
-    private class DeletePojo {
-      boolean deleted;
+      );
+    } catch (UrlNotWellFormedException ignored) {
+      showWaitingSpinner(false);
+      HttpUtil.sendDefaultServerUrlNotWellFormed(getFragmentHolderActivity());
     }
   }
 }

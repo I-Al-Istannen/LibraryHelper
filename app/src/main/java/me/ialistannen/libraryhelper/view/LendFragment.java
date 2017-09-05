@@ -48,6 +48,7 @@ public class LendFragment extends IsbnInputFragment {
 
         JsonExtractingServerCallback callback = new JsonExtractingServerCallback(
             LendFragment.this, "deleted",
+            R.string.lend_fragment_error_lending_book,
             R.string.lend_fragment_received_book_back,
             R.string.lend_fragment_server_refused
         ) {
@@ -96,7 +97,7 @@ public class LendFragment extends IsbnInputFragment {
 
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("borrower", borrower);
-    String json = Json.getGson().toJson(jsonObject);
+    String json = Json.toJson(jsonObject);
 
     RequestBody body = RequestBody.create(HttpUtil.JSON_MEDIATYPE, json);
 
@@ -108,6 +109,7 @@ public class LendFragment extends IsbnInputFragment {
     HttpUtil.getClient().newCall(request).enqueue(
         new JsonExtractingServerCallback(
             this, "added",
+            R.string.lend_fragment_error_lending_book,
             R.string.lend_fragment_lent_book, R.string.lend_fragment_server_refused
         ) {
           @Override

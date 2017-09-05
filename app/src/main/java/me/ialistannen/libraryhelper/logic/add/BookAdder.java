@@ -3,7 +3,6 @@ package me.ialistannen.libraryhelper.logic.add;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import com.google.gson.JsonObject;
 import java.io.IOException;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
@@ -39,7 +38,7 @@ public class BookAdder {
 
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("isbn", isbn.getDigitsAsString());
-    String json = Json.getGson().toJson(jsonObject);
+    String json = Json.toJson(jsonObject);
 
     makeRequest(context, json, client, callback);
   }
@@ -55,8 +54,6 @@ public class BookAdder {
         .url(url)
         .put(requestBody)
         .build();
-
-    Log.w("TEST_ME", "Request: " + request);
 
     client.newCall(request).enqueue(new Callback() {
       @Override
@@ -75,7 +72,7 @@ public class BookAdder {
         }
 
         String bodyString = body.string();
-        JsonObject jsonObject = Json.getGson().fromJson(bodyString, JsonObject.class);
+        JsonObject jsonObject = Json.fromJson(bodyString, JsonObject.class);
 
         if (jsonObject == null) {
           callback.onFailure(null, "Not a valid json object: " + bodyString,

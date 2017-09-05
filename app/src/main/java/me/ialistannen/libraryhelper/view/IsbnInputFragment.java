@@ -138,8 +138,8 @@ public abstract class IsbnInputFragment extends FragmentBase {
   /**
    * @param show Whether to show the bar, or not
    */
-  protected void showWaitingSpinner(boolean show) {
-    if (!show) {
+  void showWaitingSpinner(boolean show) {
+    if (!show || !isAdded()) {
       if (dialog != null && dialog.isShowing()) {
         dialog.dismiss();
       }

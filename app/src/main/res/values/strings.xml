@@ -91,4 +91,5 @@
   <string name="book_data_key_authors_name">Authors</string>
   <string name="book_data_key_price_name">Price</string>
   <string name="book_detail_fragment_context_menu_copy_value">Copy value</string>
+  <string name="server_response_error_received">Server returned an error: \'%s\'</string>
 </resources>
