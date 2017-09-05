@@ -60,9 +60,19 @@
 
   <string name="lend_fragment_received_book_back">Successfully removed the borrower.</string>
   <string name="lend_fragment_server_refused">Server refused deletion</string>
+  <string name="lend_fragment_input_borrower_title">Lending</string>
+  <string name="lend_fragment_input_borrower_message">Please input the name of the borrower:</string>
+  <string name="lend_fragment_lent_book">Successfully lent the book.</string>
+  <string name="lend_fragment_error_lending_book">Error lending book</string>
+  <string name="lend_fragment_choice_dialog_title">Lending a book</string>
+  <string name="lend_fragment_choice_dialog_message">Do you want to lend it or receive it back?</string>
+  <string name="lend_fragment_choice_dialog_receive">Receive</string>
+  <string name="lend_fragment_choice_dialog_lend">Lend</string>
 
   <string name="server_response_malformed">The response is malformed: \'%s\'</string>
   <string name="server_response_body_is_null">Body is null</string>
+  <string name="server_response_malformed_misses_key">The server response does not contain the key \'%s\'.</string>
+  <string name="server_response_malformed_not_a_json_primitive">The server did not respond with a valid json object. Expected a primitive.</string>
 
 
   <string name="settings_server_url_not_well_formed">The server url is not well formed.</string>
@@ -80,14 +90,4 @@
   <string name="book_data_key_language_name">Language</string>
   <string name="book_data_key_authors_name">Authors</string>
   <string name="book_data_key_price_name">Price</string>
-  <string name="lend_fragment_input_borrower_title">Lending</string>
-  <string name="lend_fragment_input_borrower_message">Please input the name of the borrower:</string>
-  <string name="lend_fragment_lent_book">Successfully lent the book.</string>
-  <string name="lend_fragment_error_lending_book">Error lending book</string>
-  <string name="server_response_malformed_misses_key">The server response does not contain the key \'%s\'.</string>
-  <string name="server_response_malformed_not_a_json_primitive">The server did not respond with a valid json object. Expected a primitive.</string>
-  <string name="lend_fragment_choice_dialog_title">Lending a book</string>
-  <string name="lend_fragment_choice_dialog_message">Do you want to lend it or receive it back?</string>
-  <string name="lend_fragment_choice_dialog_receive">Receive</string>
-  <string name="lend_fragment_choice_dialog_lend">Lend</string>
 </resources>

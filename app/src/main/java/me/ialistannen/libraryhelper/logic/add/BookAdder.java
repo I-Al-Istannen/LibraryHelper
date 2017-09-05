@@ -68,8 +68,9 @@ public class BookAdder {
       public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
         ResponseBody body = response.body();
         if (body == null) {
-          callback
-              .onFailure(null, "Unknown, got no body.", ServerResponseErrorType.RESPONSE_MALFORMED);
+          callback.onFailure(
+              null, "Unknown, got no body.", ServerResponseErrorType.RESPONSE_MALFORMED
+          );
           return;
         }
 

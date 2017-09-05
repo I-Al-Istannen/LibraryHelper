@@ -32,6 +32,7 @@ public class BookDetailList extends RecyclerView {
   }
 
   private BookDataConverter dataConverter = new BookDataConverter();
+  private ClickListener clickListener;
 
   public BookDetailList(Context context) {
     super(context);
@@ -65,8 +66,9 @@ public class BookDetailList extends RecyclerView {
         outRect.right = spacingSides;
       }
     });
-    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
-        DividerItemDecoration.VERTICAL);
+    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+        getContext(), DividerItemDecoration.VERTICAL
+    );
     dividerItemDecoration.setDrawable(
         ContextCompat.getDrawable(getContext(), R.drawable.highlighted_divider_horizontal)
     );
@@ -80,7 +82,18 @@ public class BookDetailList extends RecyclerView {
     ((BookDetailAdapter) getAdapter()).setData(dataConverter.convert(book, getContext()));
   }
 
-  private static class BookDetailAdapter extends Adapter {
+  /**
+   * Sets the click listener.
+   *
+   * <p><strong>Must be called before the list adapter binds the views.</strong>
+   *
+   * @param clickListener The {@link ClickListener} to use
+   */
+  public void setClickListener(ClickListener clickListener) {
+    this.clickListener = clickListener;
+  }
+
+  private class BookDetailAdapter extends Adapter {
 
     private List<Pair<String, String>> data;
 
@@ -95,7 +108,36 @@ public class BookDetailList extends RecyclerView {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-      ((BookDetailViewHolder) holder).setData(data.get(position));
+      final BookDetailViewHolder detailViewHolder = (BookDetailViewHolder) holder;
+      detailViewHolder.setData(data.get(position));
+
+      if (clickListener != null) {
+        detailViewHolder.getRootLayout().setOnClickListener(new OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            int childAdapterPosition = getChildAdapterPosition(detailViewHolder.getRootLayout());
+            clickListener.onClick(
+                BookDetailList.this,
+                data.get(childAdapterPosition),
+                childAdapterPosition,
+                false
+            );
+          }
+        });
+        detailViewHolder.getRootLayout().setOnLongClickListener(new OnLongClickListener() {
+          @Override
+          public boolean onLongClick(View v) {
+            int childAdapterPosition = getChildAdapterPosition(detailViewHolder.getRootLayout());
+            clickListener.onClick(
+                BookDetailList.this,
+                data.get(childAdapterPosition),
+                childAdapterPosition,
+                true
+            );
+            return true;
+          }
+        });
+      }
     }
 
     @Override
@@ -129,9 +171,24 @@ public class BookDetailList extends RecyclerView {
       ButterKnife.bind(this, itemView);
     }
 
+    View getRootLayout() {
+      return itemView.findViewById(R.id.display_book_detail_list_item_root);
+    }
+
     void setData(Pair<String, String> data) {
       key.setText(data.getKey());
       value.setText(data.getValue());
     }
+  }
+
+  public interface ClickListener {
+
+    /**
+     * @param list The {@link BookDetailList} the click occurred in
+     * @param item The item that was clicked
+     * @param position The position of the item
+     * @param longClick Whether it was a long click
+     */
+    void onClick(BookDetailList list, Pair<String, String> item, int position, boolean longClick);
   }
 }

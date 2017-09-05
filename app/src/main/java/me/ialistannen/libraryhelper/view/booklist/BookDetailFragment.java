@@ -1,5 +1,9 @@
 package me.ialistannen.libraryhelper.view.booklist;
 
+import android.content.ClipData;
+import android.content.ClipData.Item;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,15 +11,18 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
 import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
+import me.ialistannen.isbnlookuplib.util.Pair;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelper.view.FragmentBase;
+import me.ialistannen.libraryhelper.view.booklist.BookDetailList.ClickListener;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -46,6 +53,19 @@ public class BookDetailFragment extends FragmentBase {
       String title = book.getData(StandardBookDataKeys.TITLE);
       ((TextView) view.findViewById(R.id.book_title_text_view)).setText(title);
     }
+
+    detailList.setClickListener(new ClickListener() {
+      @Override
+      public void onClick(BookDetailList list, Pair<String, String> item, int position,
+          boolean longClick) {
+        // TODO: 05.09.17 Copy the value
+        ClipboardManager clipboardManager = (ClipboardManager) getFragmentHolderActivity()
+            .getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboardManager.setPrimaryClip(
+            new ClipData("BooKData", new String[]{"text"}, new Item(item.getValue())));
+        Toast.makeText(getFragmentHolderActivity(), "Copied!", Toast.LENGTH_SHORT).show();
+      }
+    });
 
     return view;
   }
