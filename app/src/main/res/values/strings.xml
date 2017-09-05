@@ -86,4 +86,8 @@
   <string name="lend_fragment_error_lending_book">Error lending book</string>
   <string name="server_response_malformed_misses_key">The server response does not contain the key \'%s\'.</string>
   <string name="server_response_malformed_not_a_json_primitive">The server did not respond with a valid json object. Expected a primitive.</string>
+  <string name="lend_fragment_choice_dialog_title">Lending a book</string>
+  <string name="lend_fragment_choice_dialog_message">Do you want to lend it or receive it back?</string>
+  <string name="lend_fragment_choice_dialog_receive">Receive</string>
+  <string name="lend_fragment_choice_dialog_lend">Lend</string>
 </resources>

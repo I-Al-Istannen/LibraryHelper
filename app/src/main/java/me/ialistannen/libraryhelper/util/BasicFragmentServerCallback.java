@@ -41,9 +41,11 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
 
     if (body == null) {
       showDialog(R.string.server_response_body_is_null);
+      onPostExecute();
       return;
     }
     if (onRawData(body)) {
+      onPostExecute();
       return;
     }
 
@@ -52,10 +54,12 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
 
     if (result == null) {
       showDialog(R.string.server_response_malformed, bodyString);
+      onPostExecute();
       return;
     }
 
     onPojoReceived(result);
+    onPostExecute();
   }
 
   /**
@@ -74,6 +78,14 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
    * @param pojo The pojo that gson decoded
    */
   protected abstract void onPojoReceived(T pojo);
+
+  /**
+   * Called after the callback has finished.
+   *
+   * <p>Will *always* be called, no matter *how* the callback exits.
+   */
+  protected void onPostExecute() {
+  }
 
   /**
    * @param message The message to display
