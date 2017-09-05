@@ -92,4 +92,7 @@
   <string name="book_data_key_price_name">Price</string>
   <string name="book_detail_fragment_context_menu_copy_value">Copy value</string>
   <string name="server_response_error_received">Server returned an error: \'%s\'</string>
+  <string name="add_fragment_server_refused">The server refused to add the book.</string>
+  <string name="server_response_unknown_error">Unknown error: \'%s\'</string>
+  <string name="server_response_timeout">The connection timed out.</string>
 </resources>

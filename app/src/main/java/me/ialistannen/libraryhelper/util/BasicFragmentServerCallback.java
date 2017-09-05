@@ -5,8 +5,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.util.Log;
 import android.widget.Toast;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
 import me.ialistannen.libraryhelper.view.FragmentBase;
@@ -33,7 +35,15 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
 
   @Override
   public void onFailure(@NonNull Call call, @NonNull IOException e) {
-    showDialog(e.getLocalizedMessage());
+    String errorType = e.getLocalizedMessage();
+    if (errorType == null || errorType.isEmpty()) {
+      errorType = e.getClass().getSimpleName();
+    }
+    if (e instanceof SocketTimeoutException) {
+      showDialog(R.string.server_response_timeout);
+    } else {
+      showDialog(R.string.server_response_unknown_error, errorType);
+    }
     onPostExecute();
   }
 
@@ -46,12 +56,10 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
       onPostExecute();
       return;
     }
-    if (onRawData(body)) {
-      onPostExecute();
-      return;
-    }
 
     String bodyString = body.string();
+
+    Log.w("TESTME", bodyString);
 
     if (!response.isSuccessful()) {
       ApiErrorPOJO error = Json.fromJson(bodyString, ApiErrorPOJO.class);
@@ -75,16 +83,6 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
 
     onPojoReceived(result);
     onPostExecute();
-  }
-
-  /**
-   * Called with the raw {@link ResponseBody}. Allows you to do more raw processing.
-   *
-   * @param body The {@link ResponseBody}
-   * @return True if you handled it, false if I should try to decode it further into JSON
-   */
-  protected boolean onRawData(@NonNull ResponseBody body) {
-    return false;
   }
 
   /**

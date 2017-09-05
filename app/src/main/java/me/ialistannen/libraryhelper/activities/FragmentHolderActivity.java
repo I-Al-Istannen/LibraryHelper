@@ -3,7 +3,6 @@ package me.ialistannen.libraryhelper.activities;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
@@ -63,8 +62,6 @@ public class FragmentHolderActivity extends AppCompatActivity {
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     Fragment fragment = getFragmentManager().findFragmentById(R.id.fragment_container);
-    Log.w("TEST_ME",
-        "Fragment container: " + getFragmentManager().findFragmentById(R.id.fragment_container));
     if (fragment != null) {
       getFragmentManager().putFragment(outState, FRAGMENT_TAG, fragment);
     }
