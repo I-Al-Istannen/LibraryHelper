@@ -1,6 +1,5 @@
 package me.ialistannen.libraryhelper.view;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -43,7 +41,6 @@ public abstract class IsbnInputFragment extends FragmentBase {
   @BindView(R.id.progress_bar)
   ProgressBar progressBar;
 
-  private Dialog dialog;
 
   @Nullable
   @Override
@@ -119,10 +116,6 @@ public abstract class IsbnInputFragment extends FragmentBase {
   }
 
   private void consumeIsbn(String isbn) {
-    if (!onGotIsbnRequest(isbn)) {
-      return;
-    }
-
     Optional<Isbn> isbnOptional = isbnConverter.fromString(isbn);
     if (!isbnOptional.isPresent()) {
       Toast.makeText(
@@ -136,41 +129,7 @@ public abstract class IsbnInputFragment extends FragmentBase {
   }
 
   /**
-   * @param show Whether to show the bar, or not
-   */
-  void showWaitingSpinner(boolean show) {
-    if (!show || !isAdded()) {
-      if (dialog != null && dialog.isShowing()) {
-        dialog.dismiss();
-      }
-      return;
-    }
-    if (dialog == null) {
-      dialog = new Dialog(getFragmentHolderActivity());
-
-      dialog.getWindow().setDimAmount(0.7F);
-
-      LayoutParams attributes = dialog.getWindow().getAttributes();
-      ProgressBar progressBar = new ProgressBar(getFragmentHolderActivity());
-      progressBar.setIndeterminate(true);
-
-      dialog.getWindow().addContentView(progressBar, attributes);
-    }
-    dialog.show();
-  }
-
-  /**
    * @param isbn The {@link Isbn} the user entered.
    */
   protected abstract void consumeIsbn(Isbn isbn);
-
-  /**
-   * Called after a request for processing a String was registered.
-   *
-   * @param isbnString The passed isbn string
-   * @return Whether to process the request
-   */
-  protected boolean onGotIsbnRequest(String isbnString) {
-    return true;
-  }
 }

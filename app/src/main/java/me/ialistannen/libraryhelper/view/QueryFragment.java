@@ -1,11 +1,8 @@
 package me.ialistannen.libraryhelper.view;
 
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,19 +19,18 @@ import butterknife.OnClick;
 import com.google.common.base.Function;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import me.ialistannen.libraryhelper.R;
-import me.ialistannen.libraryhelper.logic.query.MultipleBookQuery;
-import me.ialistannen.libraryhelper.logic.query.Query.QueryCallback;
-import me.ialistannen.libraryhelper.logic.query.Query.SearchType;
+import me.ialistannen.libraryhelper.logic.query.BookExtractorServerCallback;
 import me.ialistannen.libraryhelper.logic.query.QueryTarget;
-import me.ialistannen.libraryhelper.logic.server.ServerResponseErrorType;
+import me.ialistannen.libraryhelper.logic.query.SearchType;
 import me.ialistannen.libraryhelper.util.EnumUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.view.booklist.DisplayBookListFragment;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
+import okhttp3.HttpUrl;
+import okhttp3.Request;
 
 /**
  * A {@link android.app.Fragment} that queries the server.
@@ -74,8 +70,9 @@ public class QueryFragment extends FragmentBase {
   }
 
   private void setupSpinner() {
-    Function<SearchType, String> transformation = SearchType
-        .transformToDisplayName(getFragmentHolderActivity());
+    Function<SearchType, String> transformation = SearchType.transformToDisplayName(
+        getFragmentHolderActivity()
+    );
 
     searchTypeMapping = EnumUtil.getReverseMapping(SearchType.class, transformation);
 
@@ -100,13 +97,14 @@ public class QueryFragment extends FragmentBase {
     SearchType searchType = searchTypeMapping.get(selectedItem);
 
     if (searchType != null) {
-      performQuery(searchType, queryInput.getText().toString(), getDefaultCallback());
+      performQuery(searchType, queryInput.getText().toString());
     }
   }
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
+    // Is used here to provide the scan icon
     inflater.inflate(R.menu.fragment_isbn_input_action_bar, menu);
   }
 
@@ -136,65 +134,61 @@ public class QueryFragment extends FragmentBase {
 
     queryType.setSelection(SearchType.ISBN.ordinal());
     queryInput.setText(isbnString);
-    performQuery(SearchType.ISBN, isbnString, getDefaultCallback());
+    performQuery(SearchType.ISBN, isbnString);
   }
 
-  private QueryCallback<List<LoanableBook>> getDefaultCallback() {
-    return new QueryCallback<List<LoanableBook>>() {
-      @Override
-      public void onError(IOException exception, String error, ServerResponseErrorType type) {
-        if (!isAdded()) {
-          return;
-        }
+  private void performQuery(SearchType searchType, String argument) {
+    showWaitingSpinner(true);
 
-        final String message;
-        if (type == ServerResponseErrorType.IO) {
-          message = exception.getLocalizedMessage();
-        } else {
-          message = error;
-        }
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-          @Override
-          public void run() {
-            executeButton.setEnabled(true);
-
-            new Builder(getFragmentHolderActivity())
-                .setTitle(getString(R.string.query_fragment_error_querying_server_title))
-                .setMessage(message)
-                .create()
-                .show();
-          }
-        });
-      }
-
-      @Override
-      public void onSuccess(final List<LoanableBook> books) {
-        if (!isAdded()) {
-          return;
-        }
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-          @Override
-          public void run() {
-            executeButton.setEnabled(true);
-
-            DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
-            bookListFragment.setBooks(books);
-            getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
-          }
-        });
-
-      }
-    };
-  }
-
-  private void performQuery(SearchType searchType, String argument,
-      QueryCallback<List<LoanableBook>> callback) {
     QueryTarget queryTarget = HttpUtil.getTargetFromSettings(getFragmentHolderActivity());
 
-    new MultipleBookQuery(searchType, argument)
-        .executeQuery(queryTarget, HttpUtil.getClient(), callback);
+    Request request = getRequestForQuery(queryTarget, searchType, argument);
+
+    HttpUtil.getClient()
+        .newCall(request)
+        .enqueue(
+            new BookExtractorServerCallback(
+                this, R.string.query_fragment_error_querying_server_title
+            ) {
+              @Override
+              protected void onReceiveBooks(final List<LoanableBook> books) {
+                doSyncIfAdded(new Runnable() {
+                  @Override
+                  public void run() {
+                    executeButton.setEnabled(true);
+
+                    DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
+                    bookListFragment.setBooks(books);
+                    getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
+                  }
+                });
+              }
+
+              @Override
+              protected void onPostExecute() {
+                showWaitingSpinner(false);
+              }
+            }
+        );
+
     executeButton.setEnabled(false);
+  }
+
+  /**
+   * @param target The target of the query
+   * @param searchType The search type
+   * @param data The data to send
+   * @return The {@link HttpUrl} for it.
+   */
+  private Request getRequestForQuery(QueryTarget target, SearchType searchType, String data) {
+    HttpUrl url = target.getUrl().newBuilder()
+        .setQueryParameter("search_type", searchType.getValue())
+        .setQueryParameter("query", data)
+        .build();
+
+    return new Request.Builder()
+        .url(url)
+        .get()
+        .build();
   }
 }

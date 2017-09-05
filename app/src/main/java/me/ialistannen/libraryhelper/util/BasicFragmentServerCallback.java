@@ -5,9 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
-import android.util.Log;
 import android.widget.Toast;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.server.ApiErrorPOJO;
@@ -25,9 +25,9 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
   private FragmentBase context;
   @StringRes
   private int dialogTitle;
-  private Class<T> pojo;
+  private Type pojo;
 
-  public BasicFragmentServerCallback(FragmentBase context, int dialogTitle, Class<T> pojo) {
+  public BasicFragmentServerCallback(FragmentBase context, int dialogTitle, Type pojo) {
     this.context = context;
     this.dialogTitle = dialogTitle;
     this.pojo = pojo;
@@ -58,8 +58,6 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
     }
 
     String bodyString = body.string();
-
-    Log.w("TESTME", bodyString);
 
     if (!response.isSuccessful()) {
       ApiErrorPOJO error = Json.fromJson(bodyString, ApiErrorPOJO.class);
