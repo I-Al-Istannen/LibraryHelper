@@ -7,6 +7,7 @@ import android.util.Log;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
+import me.ialistannen.libraryhelper.view.LendFragment;
 import me.ialistannen.libraryhelper.view.QueryFragment;
 import me.ialistannen.libraryhelper.view.SettingsFragment;
 
@@ -49,6 +50,9 @@ public class FragmentHolderActivity extends AppCompatActivity {
         case "QueryFragment":
           switchToFragment(new QueryFragment());
           break;
+        case "LendFragment":
+          switchToFragment(new LendFragment());
+          break;
         case "SettingsFragment":
           switchToFragment(new SettingsFragment());
           break;
@@ -70,7 +74,7 @@ public class FragmentHolderActivity extends AppCompatActivity {
   /**
    * @param fragment The fragment to switch to
    */
-  public void switchToFragment(Fragment fragment) {
+  private void switchToFragment(Fragment fragment) {
     getFragmentManager().beginTransaction()
         .replace(R.id.fragment_container, fragment, FRAGMENT_TAG)
         .commit();

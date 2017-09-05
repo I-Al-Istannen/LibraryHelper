@@ -4,7 +4,7 @@
   <string name="activity_main_button_add_title">Add</string>
   <string name="activity_main_button_remove_title">Remove</string>
   <string name="activity_main_button_search_title">Search</string>
-  <string name="activity_main_button_lend_title">Lend</string>
+  <string name="activity_main_button_lend_title">Lending</string>
   <string name="main_activity_action_bar_settings_title">Settings</string>
 
 
@@ -30,6 +30,9 @@
   <string name="preference_server_settings_endpoint_cover_summary">The path for cover images on the server is \'%s\'.</string>
   <string name="preference_server_settings_endpoint_cover_title">Cover images endpoint path</string>
 
+  <string name="preference_server_settings_endpoint_lending_title">Lending endpoint path</string>
+  <string name="preference_server_settings_endpoint_lending_summary">The lending path on the server is \'%s\'.</string>
+
 
   <string name="add_fragment_added_book_toast">Successfully added the book</string>
   <string name="add_fragment_error_adding_book_title">An error occurred adding the book</string>
@@ -45,6 +48,8 @@
   <string name="delete_fragment_confirm_button_yes">Yes</string>
   <string name="delete_fragment_confirm_button_yes_to_all">Yes to all</string>
   <string name="delete_fragment_error_deleting_book_title">Error deleting a book</string>
+  <string name="delete_fragment_book_deleted">Successfully deleted the book</string>
+  <string name="delete_fragment_server_refused_deletion">Server said no.</string>
 
   <string name="fragment_query_execute_button_text">Execute!</string>
   <string name="search_type_isbn_name">Isbn</string>
@@ -52,6 +57,12 @@
   <string name="search_type_title_regex_name">Title with regular expressions</string>
   <string name="search_type_author_wildcard_name">Author with Wildcards</string>
   <string name="fragment_query_input_hint">Query…</string>
+
+  <string name="lend_fragment_received_book_back">Successfully removed the borrower.</string>
+  <string name="lend_fragment_server_refused">Server refused deletion</string>
+
+  <string name="server_response_malformed">The response is malformed: \'%s\'</string>
+  <string name="server_response_body_is_null">Body is null</string>
 
 
   <string name="settings_server_url_not_well_formed">The server url is not well formed.</string>
@@ -69,4 +80,10 @@
   <string name="book_data_key_language_name">Language</string>
   <string name="book_data_key_authors_name">Authors</string>
   <string name="book_data_key_price_name">Price</string>
+  <string name="lend_fragment_input_borrower_title">Lending</string>
+  <string name="lend_fragment_input_borrower_message">Please input the name of the borrower:</string>
+  <string name="lend_fragment_lent_book">Successfully lent the book.</string>
+  <string name="lend_fragment_error_lending_book">Error lending book</string>
+  <string name="server_response_malformed_misses_key">The server response does not contain the key \'%s\'.</string>
+  <string name="server_response_malformed_not_a_json_primitive">The server did not respond with a valid json object. Expected a primitive.</string>
 </resources>

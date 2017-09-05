@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import me.ialistannen.libraryhelpercommon.book.IntermediaryBook;
 
 /**
- * Some utility functions to deal with JSON.
+ * Some utility functions to deal with Json.
  */
 public class Json {
 

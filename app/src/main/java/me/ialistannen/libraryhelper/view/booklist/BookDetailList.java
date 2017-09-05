@@ -8,8 +8,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import me.ialistannen.isbnlookuplib.util.Pair;
 import me.ialistannen.libraryhelper.R;
+import me.ialistannen.libraryhelper.util.PixelUtil;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -52,13 +51,8 @@ public class BookDetailList extends RecyclerView {
     setNestedScrollingEnabled(false);
 
     addItemDecoration(new ItemDecoration() {
-      private int spacingTop = dpToPixels(18);
-      private int spacingSides = dpToPixels(8);
-
-      private int dpToPixels(int dp) {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
-      }
+      private int spacingTop = PixelUtil.dpToPixels(getContext(), 18);
+      private int spacingSides = PixelUtil.dpToPixels(getContext(), 8);
 
       @Override
       public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {

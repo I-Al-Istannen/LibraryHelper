@@ -14,7 +14,6 @@ import me.ialistannen.libraryhelper.util.Json;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -26,7 +25,6 @@ import okhttp3.ResponseBody;
  */
 public class BookAdder {
 
-  private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
   /**
    * Adds a book to the server.
@@ -51,7 +49,7 @@ public class BookAdder {
 
     HttpUrl url = HttpUtil.getServerUrlFromSettings(context, EndpointType.ADD);
 
-    RequestBody requestBody = RequestBody.create(JSON, json);
+    RequestBody requestBody = RequestBody.create(HttpUtil.JSON_MEDIATYPE, json);
 
     final Request request = new Request.Builder()
         .url(url)

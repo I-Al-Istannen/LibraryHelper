@@ -147,13 +147,13 @@ public class DeleteFragment extends IsbnInputFragment {
           public void run() {
             Toast.makeText(
                 context,
-                "Successfully deleted the book",
+                getString(R.string.delete_fragment_book_deleted),
                 Toast.LENGTH_SHORT
             ).show();
           }
         });
       } else {
-        showDialog("Server said no.");
+        showDialog(getString(R.string.delete_fragment_server_refused_deletion));
       }
     }
 

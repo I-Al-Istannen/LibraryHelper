@@ -7,6 +7,7 @@ import android.widget.Toast;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.query.QueryTarget;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 
 /**
@@ -15,6 +16,8 @@ import okhttp3.OkHttpClient;
 public class HttpUtil {
 
   private static OkHttpClient client;
+
+  public static final MediaType JSON_MEDIATYPE = MediaType.parse("application/json; charset=utf-8");
 
   /**
    * @return The shared {@link OkHttpClient}
@@ -97,7 +100,8 @@ public class HttpUtil {
     SEARCH("search"),
     ADD("add"),
     DELETE("delete"),
-    COVER("cover");
+    COVER("cover"),
+    LENDING("lending");
 
     private final String preferenceKey;
 

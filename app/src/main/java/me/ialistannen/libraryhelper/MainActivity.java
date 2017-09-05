@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import butterknife.ButterKnife;
@@ -13,6 +12,7 @@ import butterknife.OnClick;
 import me.ialistannen.libraryhelper.activities.FragmentHolderActivity;
 import me.ialistannen.libraryhelper.view.AddFragment;
 import me.ialistannen.libraryhelper.view.DeleteFragment;
+import me.ialistannen.libraryhelper.view.LendFragment;
 import me.ialistannen.libraryhelper.view.QueryFragment;
 import me.ialistannen.libraryhelper.view.SettingsFragment;
 
@@ -43,9 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    Log.w("FRAG", "ID: " + item.getItemId());
     if(item.getItemId() == R.id.main_activity_action_bar_settings) {
-      Log.w("FRAG", "Calling!");
       startFragmentActivity(SettingsFragment.class.getSimpleName());
       return true;
     }
@@ -71,5 +69,10 @@ public class MainActivity extends AppCompatActivity {
   @OnClick(R.id.button_search)
   void onQueryClicked() {
     startFragmentActivity(QueryFragment.class.getSimpleName());
+  }
+
+  @OnClick(R.id.button_lend)
+  void onLendClicked() {
+    startFragmentActivity(LendFragment.class.getSimpleName());
   }
 }
