@@ -5,7 +5,11 @@ import android.content.ClipData.Item;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnPreDrawListener;
@@ -22,7 +26,7 @@ import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.util.HttpUtil;
 import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelper.view.FragmentBase;
-import me.ialistannen.libraryhelper.view.booklist.BookDetailList.ClickListener;
+import me.ialistannen.libraryhelper.view.booklist.BookDetailList.ContextMenuCreator;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -54,16 +58,19 @@ public class BookDetailFragment extends FragmentBase {
       ((TextView) view.findViewById(R.id.book_title_text_view)).setText(title);
     }
 
-    detailList.setClickListener(new ClickListener() {
+    detailList.setContextMenuCreator(new ContextMenuCreator() {
       @Override
-      public void onClick(BookDetailList list, Pair<String, String> item, int position,
-          boolean longClick) {
-        // TODO: 05.09.17 Copy the value
-        ClipboardManager clipboardManager = (ClipboardManager) getFragmentHolderActivity()
-            .getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboardManager.setPrimaryClip(
-            new ClipData("BooKData", new String[]{"text"}, new Item(item.getValue())));
-        Toast.makeText(getFragmentHolderActivity(), "Copied!", Toast.LENGTH_SHORT).show();
+      public void onCreateContextMenu(final Pair<String, String> item, ContextMenu menu, View v,
+          ContextMenuInfo cm) {
+
+        MenuItem copyValue = menu.add(R.string.book_detail_fragment_context_menu_copy_value);
+        copyValue.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+          @Override
+          public boolean onMenuItemClick(MenuItem menu) {
+            copyToClipboard(item.getKey(), item.getValue());
+            return true;
+          }
+        });
       }
     });
 
@@ -100,5 +107,13 @@ public class BookDetailFragment extends FragmentBase {
         .url()
         .toExternalForm()
         + "/" + isbn.getDigitsAsString() + ".jpg";
+  }
+
+  private void copyToClipboard(String key, String item) {
+    ClipboardManager clipboardManager = (ClipboardManager) getFragmentHolderActivity()
+        .getSystemService(Context.CLIPBOARD_SERVICE);
+    clipboardManager.setPrimaryClip(
+        new ClipData(key, new String[]{"text"}, new Item(item)));
+    Toast.makeText(getFragmentHolderActivity(), "Copied!", Toast.LENGTH_SHORT).show();
   }
 }

@@ -8,6 +8,8 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ public class BookDetailList extends RecyclerView {
 
   private BookDataConverter dataConverter = new BookDataConverter();
   private ClickListener clickListener;
+  private ContextMenuCreator contextMenuCreator;
 
   public BookDetailList(Context context) {
     super(context);
@@ -93,6 +96,17 @@ public class BookDetailList extends RecyclerView {
     this.clickListener = clickListener;
   }
 
+  /**
+   * Sets a listener to add context menus to list items.
+   *
+   * <p><strong>Must be called before the list adapter binds the views.</strong>
+   *
+   * @param contextMenuCreator The {@link ContextMenuCreator} to use
+   */
+  public void setContextMenuCreator(ContextMenuCreator contextMenuCreator) {
+    this.contextMenuCreator = contextMenuCreator;
+  }
+
   private class BookDetailAdapter extends Adapter {
 
     private List<Pair<String, String>> data;
@@ -118,25 +132,24 @@ public class BookDetailList extends RecyclerView {
             int childAdapterPosition = getChildAdapterPosition(detailViewHolder.getRootLayout());
             clickListener.onClick(
                 BookDetailList.this,
-                data.get(childAdapterPosition),
-                childAdapterPosition,
-                false
+                detailViewHolder.getRootLayout(),
+                data.get(childAdapterPosition)
             );
           }
         });
-        detailViewHolder.getRootLayout().setOnLongClickListener(new OnLongClickListener() {
-          @Override
-          public boolean onLongClick(View v) {
-            int childAdapterPosition = getChildAdapterPosition(detailViewHolder.getRootLayout());
-            clickListener.onClick(
-                BookDetailList.this,
-                data.get(childAdapterPosition),
-                childAdapterPosition,
-                true
-            );
-            return true;
-          }
-        });
+      }
+      if (contextMenuCreator != null) {
+        detailViewHolder.getRootLayout().setOnCreateContextMenuListener(
+            new OnCreateContextMenuListener() {
+              @Override
+              public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+                int childAdapterPosition = getChildAdapterPosition(
+                    detailViewHolder.getRootLayout()
+                );
+                Pair<String, String> item = data.get(childAdapterPosition);
+                contextMenuCreator.onCreateContextMenu(item, menu, v, menuInfo);
+              }
+            });
       }
     }
 
@@ -185,10 +198,21 @@ public class BookDetailList extends RecyclerView {
 
     /**
      * @param list The {@link BookDetailList} the click occurred in
+     * @param view The clicked view
      * @param item The item that was clicked
-     * @param position The position of the item
-     * @param longClick Whether it was a long click
      */
-    void onClick(BookDetailList list, Pair<String, String> item, int position, boolean longClick);
+    void onClick(BookDetailList list, View view, Pair<String, String> item);
+  }
+
+  public interface ContextMenuCreator {
+
+    /**
+     * @param item The item that was clicked
+     * @param menu The context menu
+     * @param v The clicked view
+     * @param menuInfo The {@link ContextMenuInfo}
+     */
+    void onCreateContextMenu(Pair<String, String> item, ContextMenu menu, View v,
+        ContextMenuInfo menuInfo);
   }
 }

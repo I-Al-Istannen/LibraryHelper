@@ -134,6 +134,8 @@ public class QueryFragment extends FragmentBase {
       return;
     }
 
+    queryType.setSelection(SearchType.ISBN.ordinal());
+    queryInput.setText(isbnString);
     performQuery(SearchType.ISBN, isbnString, getDefaultCallback());
   }
 
