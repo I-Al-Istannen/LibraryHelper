@@ -167,6 +167,12 @@ public class QueryFragment extends FragmentBase {
               @Override
               protected void onPostExecute() {
                 showWaitingSpinner(false);
+                doSyncIfAdded(new Runnable() {
+                  @Override
+                  public void run() {
+                    executeButton.setEnabled(true);
+                  }
+                });
               }
             }
         );

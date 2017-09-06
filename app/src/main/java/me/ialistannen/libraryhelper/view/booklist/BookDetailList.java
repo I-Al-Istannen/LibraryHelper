@@ -52,6 +52,7 @@ public class BookDetailList extends RecyclerView {
   private void init() {
     setLayoutManager(new LinearLayoutManager(getContext()));
     setAdapter(new BookDetailAdapter());
+    ((BookDetailAdapter) getAdapter()).setData(Collections.<Pair<String, String>>emptyList());
     setNestedScrollingEnabled(false);
 
     addItemDecoration(new ItemDecoration() {
