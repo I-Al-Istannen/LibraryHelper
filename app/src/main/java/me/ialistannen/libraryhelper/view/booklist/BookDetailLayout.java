@@ -4,6 +4,9 @@ import android.content.ClipData;
 import android.content.ClipData.Item;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -41,6 +44,7 @@ public class BookDetailLayout extends FrameLayout {
   BookDetailList detailList;
 
   private boolean coverAdded;
+  private boolean showPlaceholder;
 
   public BookDetailLayout(Context context) {
     super(context);
@@ -82,8 +86,9 @@ public class BookDetailLayout extends FrameLayout {
     removeAllViews();
 
     addView(view);
-  }
 
+    showPlaceholder(true);
+  }
 
   private void setCover(View view, final LoanableBook book) {
     final ImageView cover = view.findViewById(R.id.cover_image_view);
@@ -105,12 +110,75 @@ public class BookDetailLayout extends FrameLayout {
     });
   }
 
+  /**
+   * @param book The {@link LoanableBook} to display
+   */
   public void setBook(LoanableBook book) {
+    showPlaceholder(false);
     setCover(this, book);
     detailList.setBook(book);
 
     String title = book.getData(StandardBookDataKeys.TITLE);
     ((TextView) findViewById(R.id.book_title_text_view)).setText(title);
+  }
+
+  public void showPlaceholder(boolean show) {
+    if (getContext() == null) {
+      return;
+    }
+    showPlaceholder = show;
+    final TextView title = findViewById(R.id.book_title_text_view);
+
+    if (show) {
+      title.setText(getContext().getString(R.string.book_detail_layout_placeholder_title));
+      new Handler(Looper.getMainLooper()).post(new Runnable() {
+        private int counter = 0;
+        private boolean reverseDirection;
+
+        @Override
+        public void run() {
+          if (!isShown()) {
+            return;
+          }
+          if (showPlaceholder) {
+            postDelayed(this, 1000);
+          } else {
+            return;
+          }
+
+          if (counter >= 3) {
+            reverseDirection = true;
+          } else if (counter <= 0) {
+            reverseDirection = false;
+          }
+
+          if (reverseDirection) {
+            counter--;
+          } else {
+            counter++;
+          }
+
+          StringBuilder text = new StringBuilder(
+              getContext().getString(R.string.book_detail_layout_placeholder_title)
+          );
+
+          for (int i = 0; i < counter; i++) {
+            text.append(".");
+          }
+
+          title.setText(text.toString());
+        }
+      });
+    }
+
+    ImageView coverView = findViewById(R.id.cover_image_view);
+
+    if (show) {
+      //noinspection deprecation - As we are having a min of 19, not 23
+      coverView.setBackgroundColor(getResources().getColor(R.color.colorPlaceholder));
+    } else {
+      coverView.setBackgroundColor(Color.TRANSPARENT);
+    }
   }
 
   private String buildCoverImageUrl(LoanableBook book) {

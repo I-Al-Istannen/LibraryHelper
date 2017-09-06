@@ -2,6 +2,8 @@ package me.ialistannen.libraryhelper.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -102,7 +104,7 @@ public abstract class IsbnInputFragment extends FragmentBase {
       return;
     }
 
-    String isbnString = scanResult.getContents();
+    final String isbnString = scanResult.getContents();
     if (isbnString == null || isbnString.isEmpty()) {
       return;
     }
@@ -113,6 +115,14 @@ public abstract class IsbnInputFragment extends FragmentBase {
     }
 
     consumeIsbn(isbnString);
+
+    // Ugly hack to give the edit text time to update
+    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        consumeIsbn(isbnString);
+      }
+    }, 200);
   }
 
   private void consumeIsbn(String isbn) {

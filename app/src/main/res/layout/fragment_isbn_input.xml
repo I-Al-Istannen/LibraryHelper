@@ -24,7 +24,7 @@
     app:theme="@style/InputTextLayout"
     app:layout_constraintVertical_chainStyle="packed">
 
-    <EditText
+    <android.support.design.widget.TextInputEditText
       android:id="@+id/isbn_edit_text"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

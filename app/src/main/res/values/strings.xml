@@ -98,4 +98,6 @@
   <string name="book_data_key_language_name">Language</string>
   <string name="book_data_key_authors_name">Authors</string>
   <string name="book_data_key_price_name">Price</string>
+  <string name="add_fragment_isbn_lookup_error">Error looking up the book information. Adding might still work.</string>
+  <string name="book_detail_layout_placeholder_title">Book data loading</string>
 </resources>
