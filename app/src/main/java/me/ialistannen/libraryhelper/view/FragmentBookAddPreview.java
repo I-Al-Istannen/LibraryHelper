@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.google.common.base.Function;
 import com.google.gson.JsonObject;
 import java.util.Locale;
 import me.ialistannen.isbnlookuplib.book.Book;
+import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
 import me.ialistannen.isbnlookuplib.isbn.IsbnConverter;
 import me.ialistannen.isbnlookuplib.lookup.IsbnLookupProvider;
@@ -50,6 +52,12 @@ public class FragmentBookAddPreview extends FragmentBase {
     ButterKnife.bind(this, view);
 
     detailLayout.showPlaceholder(true);
+    detailLayout.setCoverUrlProvider(new Function<LoanableBook, String>() {
+      @Override
+      public String apply(LoanableBook book) {
+        return book.getData(StandardBookDataKeys.COVER_IMAGE_URL);
+      }
+    });
 
     return view;
   }
@@ -81,14 +89,13 @@ public class FragmentBookAddPreview extends FragmentBase {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            detailLayout.showPlaceholder(false);
-
             if (book == null) {
               new AlertDialog.Builder(getFragmentHolderActivity())
                   .setTitle(R.string.add_fragment_error_adding_book_title)
                   .setMessage(R.string.add_fragment_isbn_lookup_error)
                   .create()
                   .show();
+              detailLayout.setError();
               return;
             }
 
@@ -130,7 +137,6 @@ public class FragmentBookAddPreview extends FragmentBase {
           @Override
           protected void onPostExecute() {
             showWaitingSpinner(false);
-            detailLayout.showPlaceholder(false);
           }
         }
     );

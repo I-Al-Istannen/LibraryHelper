@@ -2,8 +2,6 @@ package me.ialistannen.libraryhelper.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +41,7 @@ public abstract class IsbnInputFragment extends FragmentBase {
   @BindView(R.id.progress_bar)
   ProgressBar progressBar;
 
+  private String lastIsbn;
 
   @Nullable
   @Override
@@ -112,17 +111,10 @@ public abstract class IsbnInputFragment extends FragmentBase {
     EditText editText = isbnInputField.getEditText();
     if (editText != null) {
       editText.setText(isbnString);
+      lastIsbn = isbnString;
     }
 
     consumeIsbn(isbnString);
-
-    // Ugly hack to give the edit text time to update
-    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        consumeIsbn(isbnString);
-      }
-    }, 200);
   }
 
   private void consumeIsbn(String isbn) {
@@ -136,6 +128,25 @@ public abstract class IsbnInputFragment extends FragmentBase {
       return;
     }
     consumeIsbn(isbnOptional.get());
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (lastIsbn != null && isbnInputField != null && isbnInputField.getEditText() != null) {
+      isbnInputField.getEditText().setText(lastIsbn);
+    }
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    if (isbnInputField.getEditText() != null) {
+      String text = isbnInputField.getEditText().getText().toString();
+      if (!text.trim().isEmpty()) {
+        lastIsbn = text;
+      }
+    }
   }
 
   /**

@@ -4,9 +4,9 @@ import android.content.ClipData;
 import android.content.ClipData.Item;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.common.base.Function;
 import com.squareup.picasso.Picasso;
 import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
 import me.ialistannen.isbnlookuplib.isbn.Isbn;
@@ -44,7 +45,8 @@ public class BookDetailLayout extends FrameLayout {
   BookDetailList detailList;
 
   private boolean coverAdded;
-  private boolean showPlaceholder;
+  private boolean animatePlaceholder;
+  private Function<LoanableBook, String> coverUrlProvider;
 
   public BookDetailLayout(Context context) {
     super(context);
@@ -60,6 +62,12 @@ public class BookDetailLayout extends FrameLayout {
 
   private void init() {
     coverAdded = false;
+    coverUrlProvider = new Function<LoanableBook, String>() {
+      @Override
+      public String apply(LoanableBook book) {
+        return buildServerCoverImageUrl(book);
+      }
+    };
 
     LayoutInflater inflater = LayoutInflater.from(getContext());
 
@@ -100,7 +108,7 @@ public class BookDetailLayout extends FrameLayout {
         }
 
         Picasso.with(getContext())
-            .load(buildCoverImageUrl(book))
+            .load(coverUrlProvider.apply(book))
             .resize(cover.getWidth(), cover.getHeight())
             .centerInside()
             .into(cover);
@@ -122,12 +130,35 @@ public class BookDetailLayout extends FrameLayout {
     ((TextView) findViewById(R.id.book_title_text_view)).setText(title);
   }
 
+  /**
+   * @param coverUrlProvider The supplier to get a link to the cover image based on the book
+   */
+  public void setCoverUrlProvider(Function<LoanableBook, String> coverUrlProvider) {
+    this.coverUrlProvider = coverUrlProvider;
+  }
+
+  /**
+   * Sets the error state.
+   *
+   * <p>Placeholders will be shown, but not animated.
+   */
+  public void setError() {
+    showPlaceholder(true);
+    animatePlaceholder = false;
+  }
+
+  /**
+   * Whether to show placeholders
+   *
+   * @param show True if placeholders should be shown
+   */
   public void showPlaceholder(boolean show) {
     if (getContext() == null) {
       return;
     }
-    showPlaceholder = show;
     final TextView title = findViewById(R.id.book_title_text_view);
+
+    animatePlaceholder = show;
 
     if (show) {
       title.setText(getContext().getString(R.string.book_detail_layout_placeholder_title));
@@ -140,7 +171,7 @@ public class BookDetailLayout extends FrameLayout {
           if (!isShown()) {
             return;
           }
-          if (showPlaceholder) {
+          if (animatePlaceholder) {
             postDelayed(this, 1000);
           } else {
             return;
@@ -174,14 +205,13 @@ public class BookDetailLayout extends FrameLayout {
     ImageView coverView = findViewById(R.id.cover_image_view);
 
     if (show) {
-      //noinspection deprecation - As we are having a min of 19, not 23
-      coverView.setBackgroundColor(getResources().getColor(R.color.colorPlaceholder));
-    } else {
-      coverView.setBackgroundColor(Color.TRANSPARENT);
+      coverView.setImageDrawable(
+          ContextCompat.getDrawable(getContext(), R.drawable.book_cover_placeholder)
+      );
     }
   }
 
-  private String buildCoverImageUrl(LoanableBook book) {
+  private String buildServerCoverImageUrl(LoanableBook book) {
     Isbn isbn = book.getData(StandardBookDataKeys.ISBN);
     return HttpUtil.getServerUrlFromSettings(getContext(), EndpointType.COVER)
         .url()
