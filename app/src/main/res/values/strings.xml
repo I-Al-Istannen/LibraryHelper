@@ -16,6 +16,7 @@
 
   <string name="preference_server_settings_cat_ip">Server ip Settings</string>
   <string name="preference_server_settings_cat_endpoint">Endpoint settings</string>
+  <string name="preference_server_settings_cat_account">Account settings</string>
 
 
   <string name="preference_server_settings_endpoint_search_title">Search endpoint path</string>
@@ -32,6 +33,14 @@
 
   <string name="preference_server_settings_endpoint_lending_title">Lending endpoint path</string>
   <string name="preference_server_settings_endpoint_lending_summary">The lending path on the server is \'%s\'.</string>
+
+  <string name="preference_server_settings_endpoint_login_title">Login endpoint path</string>
+  <string name="preference_server_settings_endpoint_login_summary">The login path on the server is \'%s\'.</string>
+
+  <string name="preference_server_settings_account_username_title">Username</string>
+  <string name="preference_server_settings_account_username_summary">The selected username is \'%s\'.</string>
+  <string name="preference_server_settings_account_password_title">Password</string>
+  <string name="preference_server_settings_account_password_summary">The password to use for authentication. This will be stored in plaintext on your phone, sooo…</string>
 
 
   <string name="add_fragment_added_book_toast">Successfully added the book</string>
@@ -100,4 +109,11 @@
   <string name="book_data_key_language_name">Language</string>
   <string name="book_data_key_authors_name">Authors</string>
   <string name="book_data_key_price_name">Price</string>
+
+
+  <string name="error_fetching_jwt_title">Error while authenticating</string>
+  <string name="error_fetching_jwt_message_username_not_set">There is no username set in the settings.</string>
+  <string name="error_fetching_jwt_message_password_not_set">There is no password set in the settings.</string>
+  <string name="fetched_jtw_title">Authentication successful</string>
+  <string name="error_fetching_jwt">Authentication unsuccessful</string>
 </resources>

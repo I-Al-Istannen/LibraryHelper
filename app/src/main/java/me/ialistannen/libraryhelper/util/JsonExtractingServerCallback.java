@@ -4,7 +4,6 @@ import android.support.annotation.StringRes;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.ialistannen.libraryhelper.R;
-import me.ialistannen.libraryhelper.view.FragmentBase;
 
 /**
  * A {@link BasicFragmentServerCallback} that extracts a boolean response via a specified key.
@@ -22,7 +21,7 @@ public class JsonExtractingServerCallback extends BasicFragmentServerCallback<Js
    * @param successToast The message to toast if it was successful
    * @param failureDialog The dialog message to show it was unsuccessful
    */
-  public JsonExtractingServerCallback(FragmentBase context, String jsonKey,
+  public JsonExtractingServerCallback(Object context, String jsonKey,
       @StringRes int title,
       @StringRes int successToast, @StringRes int failureDialog) {
     super(context, title, JsonObject.class);

@@ -144,38 +144,36 @@ public class QueryFragment extends FragmentBase {
 
     Request request = getRequestForQuery(queryTarget, searchType, argument);
 
-    HttpUtil.getClient()
-        .newCall(request)
-        .enqueue(
-            new BookExtractorServerCallback(
-                this, R.string.query_fragment_error_querying_server_title
-            ) {
+    HttpUtil.makeCall(request, getActivity(),
+        new BookExtractorServerCallback(
+            this, R.string.query_fragment_error_querying_server_title
+        ) {
+          @Override
+          protected void onReceiveBooks(final List<LoanableBook> books) {
+            doSyncIfAdded(new Runnable() {
               @Override
-              protected void onReceiveBooks(final List<LoanableBook> books) {
-                doSyncIfAdded(new Runnable() {
-                  @Override
-                  public void run() {
-                    executeButton.setEnabled(true);
+              public void run() {
+                executeButton.setEnabled(true);
 
-                    DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
-                    bookListFragment.setBooks(books);
-                    getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
-                  }
-                });
+                DisplayBookListFragment bookListFragment = new DisplayBookListFragment();
+                bookListFragment.setBooks(books);
+                getFragmentHolderActivity().switchToFragmentPushBack(bookListFragment);
               }
+            });
+          }
 
+          @Override
+          protected void onPostExecute() {
+            showWaitingSpinner(false);
+            doSyncIfAdded(new Runnable() {
               @Override
-              protected void onPostExecute() {
-                showWaitingSpinner(false);
-                doSyncIfAdded(new Runnable() {
-                  @Override
-                  public void run() {
-                    executeButton.setEnabled(true);
-                  }
-                });
+              public void run() {
+                executeButton.setEnabled(true);
               }
-            }
-        );
+            });
+          }
+        }
+    );
 
     executeButton.setEnabled(false);
   }

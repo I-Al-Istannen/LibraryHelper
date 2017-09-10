@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   >
 
   <PreferenceScreen
@@ -75,6 +76,36 @@
         android:inputType="text"
         android:summary="@string/preference_server_settings_endpoint_lending_summary"
         android:defaultValue="/lending"
+        />
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_endpoint_login"
+        android:key="preference_server_settings_endpoint_login"
+        android:title="@string/preference_server_settings_endpoint_login_title"
+        android:inputType="text"
+        android:summary="@string/preference_server_settings_endpoint_login_summary"
+        android:defaultValue="/login"
+        />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+      app:title="@string/preference_server_settings_cat_account">
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_account_username"
+        android:key="preference_server_settings_account_username"
+        android:title="@string/preference_server_settings_account_username_title"
+        android:inputType="text"
+        android:summary="@string/preference_server_settings_account_username_summary"
+        android:defaultValue="Change me"
+        />
+
+      <EditTextPreference
+        android:id="@+id/preference_server_settings_account_password"
+        android:key="preference_server_settings_account_password"
+        android:title="@string/preference_server_settings_account_password_title"
+        android:inputType="textPassword"
+        android:summary="@string/preference_server_settings_account_password_summary"
         />
 
     </PreferenceCategory>

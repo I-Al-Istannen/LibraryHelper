@@ -120,14 +120,14 @@ public class FragmentBookAddPreview extends FragmentBase {
     jsonObject.addProperty("isbn", isbn.getDigitsAsString());
     String json = Json.toJson(jsonObject);
 
-    RequestBody requestBody = RequestBody.create(HttpUtil.JSON_MEDIATYPE, json);
+    RequestBody requestBody = RequestBody.create(HttpUtil.JSON_MEDIA_TYPE, json);
 
     final Request request = new Request.Builder()
         .url(url)
         .put(requestBody)
         .build();
 
-    HttpUtil.getClient().newCall(request).enqueue(
+    HttpUtil.makeCall(request, getActivity(),
         new JsonExtractingServerCallback(
             this, "acknowledged",
             R.string.query_fragment_error_querying_server_title,

@@ -1,11 +1,14 @@
 package me.ialistannen.libraryhelper.util;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.widget.Toast;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
@@ -22,15 +25,44 @@ import okhttp3.ResponseBody;
  */
 public abstract class BasicFragmentServerCallback<T> implements Callback {
 
-  private FragmentBase context;
+  private Object context;
   @StringRes
   private int dialogTitle;
   private Type pojo;
+  private Predicate<Object> canToast;
 
-  public BasicFragmentServerCallback(FragmentBase context, int dialogTitle, Type pojo) {
+  public BasicFragmentServerCallback(Object context, int dialogTitle, Type pojo) {
+    this(context, dialogTitle, pojo, null);
+    canToast = new Predicate<Object>() {
+      @Override
+      public boolean apply(Object context) {
+        //noinspection SimplifiableIfStatement
+        if (BasicFragmentServerCallback.this.context instanceof FragmentBase) {
+          return ((FragmentBase) BasicFragmentServerCallback.this.context).isAdded();
+        }
+        return true;
+      }
+    };
+  }
+
+  /**
+   * @param context The {@link Context} or {@link FragmentBase} to use for lookups and displaying
+   * errors
+   * @param dialogTitle The title of the dialog
+   * @param pojo The pojo to deserialize to
+   * @param canToast A predicate to indicate whether the callback can display an error dialog/toast
+   * or if that would lead to an error.
+   */
+  public BasicFragmentServerCallback(Object context, int dialogTitle, Type pojo,
+      Predicate<Object> canToast) {
+    Preconditions.checkArgument(
+        context instanceof Context || context instanceof FragmentBase,
+        "The context needs to be a Context or a FragmentBase instance!"
+    );
     this.context = context;
     this.dialogTitle = dialogTitle;
     this.pojo = pojo;
+    this.canToast = canToast;
   }
 
   @Override
@@ -98,6 +130,15 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
   protected void onPostExecute() {
   }
 
+  private Context getContext() {
+    if (context instanceof Context) {
+      return (Context) context;
+    } else if (context instanceof FragmentBase) {
+      return ((FragmentBase) context).getActivity();
+    }
+    throw new IllegalStateException("Context is null? Context: " + context);
+  }
+
   /**
    * @param message The message to display
    * @param messageFormatArguments The format arguments for the message
@@ -108,7 +149,7 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
     doSyncIfAdded(new Runnable() {
       @Override
       public void run() {
-        showDialog(context.getString(message, messageFormatArguments));
+        showDialog(getContext().getString(message, messageFormatArguments));
       }
     });
   }
@@ -120,7 +161,7 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
     doSyncIfAdded(new Runnable() {
       @Override
       public void run() {
-        new AlertDialog.Builder(context.getActivity())
+        new AlertDialog.Builder(getContext())
             .setTitle(dialogTitle)
             .setMessage(message)
             .create()
@@ -138,8 +179,8 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
       @Override
       public void run() {
         Toast.makeText(
-            context.getActivity(),
-            context.getString(message, formatArguments),
+            getContext(),
+            getContext().getString(message, formatArguments),
             Toast.LENGTH_SHORT
         ).show();
       }
@@ -152,7 +193,7 @@ public abstract class BasicFragmentServerCallback<T> implements Callback {
    * @param runnable The code to execute
    */
   protected void doSyncIfAdded(Runnable runnable) {
-    if (!context.isAdded()) {
+    if (!canToast.apply(this)) {
       return;
     }
     // Do not post if we are already on the main thread

@@ -57,7 +57,7 @@ public class LendFragment extends IsbnInputFragment {
             showWaitingSpinner(false);
           }
         };
-        HttpUtil.getClient().newCall(request).enqueue(callback);
+        HttpUtil.makeCall(request, getActivity(), callback);
       }
     };
   }
@@ -99,14 +99,14 @@ public class LendFragment extends IsbnInputFragment {
     jsonObject.addProperty("borrower", borrower);
     String json = Json.toJson(jsonObject);
 
-    RequestBody body = RequestBody.create(HttpUtil.JSON_MEDIATYPE, json);
+    RequestBody body = RequestBody.create(HttpUtil.JSON_MEDIA_TYPE, json);
 
     Request request = new Request.Builder()
         .url(getHttpUrl(isbn))
         .put(body)
         .build();
 
-    HttpUtil.getClient().newCall(request).enqueue(
+    HttpUtil.makeCall(request, getActivity(),
         new JsonExtractingServerCallback(
             this, "added",
             R.string.lend_fragment_error_lending_book,

@@ -82,7 +82,7 @@ public class DeleteFragment extends IsbnInputFragment {
           .delete()
           .build();
 
-      HttpUtil.getClient().newCall(request).enqueue(
+      HttpUtil.makeCall(request, getActivity(),
           new JsonExtractingServerCallback(
               this, "deleted",
               R.string.delete_fragment_error_deleting_book_title,
