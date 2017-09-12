@@ -67,6 +67,7 @@
   <string name="search_type_title_wildcard_name">Title with Wildcards</string>
   <string name="search_type_title_regex_name">Title with regular expressions</string>
   <string name="search_type_author_wildcard_name">Author with Wildcards</string>
+  <string name="search_type_title_match_name">Title fuzzy match (phrase or single word)</string>
   <string name="fragment_query_input_hint">Query…</string>
 
   <string name="lend_fragment_received_book_back">Successfully removed the borrower.</string>

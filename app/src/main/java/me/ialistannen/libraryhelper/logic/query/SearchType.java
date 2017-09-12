@@ -13,6 +13,7 @@ public enum SearchType {
   ISBN("isbn", R.string.search_type_isbn_name),
   TITLE_WILDCARD("title_wildcard", R.string.search_type_title_wildcard_name),
   TITLE_REGEX("title_regex", R.string.search_type_title_regex_name),
+  TITLE_MATCH("title_match", R.string.search_type_title_match_name),
   AUTHOR_WILDCARD("author_wildcard", R.string.search_type_author_wildcard_name);
 
   private String value;
