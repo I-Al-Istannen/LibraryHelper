@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import com.google.common.base.Function;
@@ -28,6 +29,18 @@ import okhttp3.ResponseBody;
  * A small util to help with getting cover images.
  */
 class CoverUtil {
+
+  // 20 MB
+  private static final int CACHE_SIZE = 1024 * 1024 * 20;
+
+  private static LruCache<String, Bitmap> coverCache = new LruCache<String, Bitmap>(CACHE_SIZE) {
+    @Override
+    protected int sizeOf(String key, Bitmap value) {
+      System.out.println(key + " has size " + value.getByteCount());
+      System.out.println("Cache size: " + CACHE_SIZE);
+      return value.getByteCount();
+    }
+  };
 
   private LoanableBook book;
   private Supplier<Context> contextSupplier;
@@ -79,6 +92,14 @@ class CoverUtil {
     if (book == null) {
       throw new IllegalStateException("No book set!");
     }
+    imageView.setScaleType(ScaleType.CENTER_INSIDE);
+
+    final Isbn isbn = book.getData(StandardBookDataKeys.ISBN);
+    Bitmap cachedBitmap = coverCache.get(isbn.getDigitsAsString());
+    if (cachedBitmap != null) {
+      imageView.setImageBitmap(cachedBitmap);
+      return;
+    }
 
     String url = coverUrlProvider.apply(book);
     if (url == null) {
@@ -116,10 +137,11 @@ class CoverUtil {
         byte[] body = responseBody.bytes();
         final Bitmap bitmap = BitmapFactory.decodeByteArray(body, 0, body.length);
 
+        coverCache.put(isbn.getDigitsAsString(), bitmap);
+
         new Handler(Looper.getMainLooper()).post(new Runnable() {
           @Override
           public void run() {
-            imageView.setScaleType(ScaleType.CENTER_INSIDE);
             imageView.setImageBitmap(bitmap);
           }
         });

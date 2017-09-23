@@ -43,7 +43,6 @@ public class BookDetailLayout extends FrameLayout {
   @BindView(R.id.book_detail_list)
   BookDetailList detailList;
 
-  private boolean coverAdded;
   private boolean animatePlaceholder;
 
   public BookDetailLayout(Context context) {
@@ -63,8 +62,6 @@ public class BookDetailLayout extends FrameLayout {
   }
 
   private void init() {
-    coverAdded = false;
-
     LayoutInflater inflater = LayoutInflater.from(getContext());
 
     View view = inflater.inflate(R.layout.book_detail_layout, this, false);
@@ -107,7 +104,7 @@ public class BookDetailLayout extends FrameLayout {
           }
         });
         if (coverUrlProvider != null) {
-          coverUtil.withUrlProvider(coverUrlProvider);
+          coverUtil = coverUtil.withUrlProvider(coverUrlProvider);
         }
         coverUtil
             .withBook(book)
