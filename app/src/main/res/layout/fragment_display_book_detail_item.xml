@@ -33,21 +33,4 @@
 
     android:layout_below="@id/text_view_key"
     />
-
-  <EditText
-    android:id="@+id/text_view_value_editor"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
-    android:imeOptions="actionDone"
-
-    android:hint="@string/input_new_value"
-    android:text="@string/lorem_ipsum_dolor_sit_amet"
-    android:textAlignment="center"
-    android:textSize="14sp"
-
-    android:visibility="gone"
-
-    android:layout_below="@id/text_view_key"
-    />
 </RelativeLayout>
