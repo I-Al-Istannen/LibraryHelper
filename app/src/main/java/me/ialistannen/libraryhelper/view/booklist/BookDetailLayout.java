@@ -22,13 +22,10 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.google.common.base.Function;
-import com.squareup.picasso.Picasso;
+import com.google.common.base.Supplier;
 import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
-import me.ialistannen.isbnlookuplib.isbn.Isbn;
 import me.ialistannen.isbnlookuplib.util.Pair;
 import me.ialistannen.libraryhelper.R;
-import me.ialistannen.libraryhelper.util.HttpUtil;
-import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelper.view.booklist.BookDetailList.ContextMenuCreator;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
@@ -36,6 +33,8 @@ import me.ialistannen.libraryhelpercommon.book.LoanableBook;
  *
  */
 public class BookDetailLayout extends FrameLayout {
+
+  private Function<LoanableBook, String> coverUrlProvider;
 
   {
     init();
@@ -46,7 +45,6 @@ public class BookDetailLayout extends FrameLayout {
 
   private boolean coverAdded;
   private boolean animatePlaceholder;
-  private Function<LoanableBook, String> coverUrlProvider;
 
   public BookDetailLayout(Context context) {
     super(context);
@@ -60,14 +58,12 @@ public class BookDetailLayout extends FrameLayout {
     super(context, attrs, defStyleAttr);
   }
 
+  public void setCoverUrlProvider(Function<LoanableBook, String> coverUrlProvider) {
+    this.coverUrlProvider = coverUrlProvider;
+  }
+
   private void init() {
     coverAdded = false;
-    coverUrlProvider = new Function<LoanableBook, String>() {
-      @Override
-      public String apply(LoanableBook book) {
-        return buildServerCoverImageUrl(book);
-      }
-    };
 
     LayoutInflater inflater = LayoutInflater.from(getContext());
 
@@ -103,16 +99,22 @@ public class BookDetailLayout extends FrameLayout {
     cover.getViewTreeObserver().addOnPreDrawListener(new OnPreDrawListener() {
       @Override
       public boolean onPreDraw() {
-        if (coverAdded) {
-          return true;
-        }
 
-        Picasso.with(getContext())
-            .load(coverUrlProvider.apply(book))
-            .resize(cover.getWidth(), cover.getHeight())
-            .centerInside()
-            .into(cover);
-        coverAdded = true;
+        CoverUtil coverUtil = CoverUtil.withContext(new Supplier<Context>() {
+          @Override
+          public Context get() {
+            return getContext();
+          }
+        });
+        if (coverUrlProvider != null) {
+          coverUtil.withUrlProvider(coverUrlProvider);
+        }
+        coverUtil
+            .withBook(book)
+            .loadInto(cover);
+
+        // only fire once
+        cover.getViewTreeObserver().removeOnPreDrawListener(this);
         return true;
       }
     });
@@ -128,13 +130,6 @@ public class BookDetailLayout extends FrameLayout {
 
     String title = book.getData(StandardBookDataKeys.TITLE);
     ((TextView) findViewById(R.id.book_title_text_view)).setText(title);
-  }
-
-  /**
-   * @param coverUrlProvider The supplier to get a link to the cover image based on the book
-   */
-  public void setCoverUrlProvider(Function<LoanableBook, String> coverUrlProvider) {
-    this.coverUrlProvider = coverUrlProvider;
   }
 
   /**
@@ -209,14 +204,6 @@ public class BookDetailLayout extends FrameLayout {
           ContextCompat.getDrawable(getContext(), R.drawable.book_cover_placeholder)
       );
     }
-  }
-
-  private String buildServerCoverImageUrl(LoanableBook book) {
-    Isbn isbn = book.getData(StandardBookDataKeys.ISBN);
-    return HttpUtil.getServerUrlFromSettings(getContext(), EndpointType.COVER)
-        .url()
-        .toExternalForm()
-        + "/" + isbn.getDigitsAsString() + ".jpg";
   }
 
   private void copyToClipboard(String key, String item) {
