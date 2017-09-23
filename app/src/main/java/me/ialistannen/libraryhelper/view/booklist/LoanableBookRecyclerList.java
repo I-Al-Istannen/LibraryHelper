@@ -14,16 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.squareup.picasso.Picasso;
+import com.google.common.base.Supplier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import me.ialistannen.isbnlookuplib.book.StandardBookDataKeys;
-import me.ialistannen.isbnlookuplib.isbn.Isbn;
 import me.ialistannen.isbnlookuplib.util.Pair;
 import me.ialistannen.libraryhelper.R;
-import me.ialistannen.libraryhelper.util.HttpUtil;
-import me.ialistannen.libraryhelper.util.HttpUtil.EndpointType;
 import me.ialistannen.libraryhelpercommon.book.LoanableBook;
 
 /**
@@ -169,8 +166,6 @@ public class LoanableBookRecyclerList extends RecyclerView {
     @BindView(R.id.cover_image_view)
     ImageView coverImage;
 
-    private boolean imageLoaded;
-
     private BookViewHolder(View itemView) {
       super(itemView);
 
@@ -181,33 +176,25 @@ public class LoanableBookRecyclerList extends RecyclerView {
       return itemView.findViewById(R.id.display_book_list_item_root);
     }
 
-    private void setBook(LoanableBook book) {
-      imageLoaded = false;
+    private void setBook(final LoanableBook book) {
       title.setText(book.getData(StandardBookDataKeys.TITLE).toString());
       List<Pair<String, String>> authors = book.getData(StandardBookDataKeys.AUTHORS);
       author.setText(authors.get(0).getKey());
-
-      Isbn isbn = book.getData(StandardBookDataKeys.ISBN);
-
-      Context context = author.getContext();
-      final String url = HttpUtil.getServerUrlFromSettings(context, EndpointType.COVER)
-          .url()
-          .toExternalForm() + "/" + isbn.getDigitsAsString() + ".jpg";
 
       coverImage.getViewTreeObserver().addOnPreDrawListener(new OnPreDrawListener() {
         @Override
         public boolean onPreDraw() {
           // only load it once
-          if (imageLoaded) {
-            return true;
-          }
-          imageLoaded = true;
-          Picasso.with(author.getContext())
-              .load(url)
-              .resize(coverImage.getWidth(), coverImage.getHeight())
-              .centerInside()
-              .placeholder(R.drawable.ic_book)
-              .into(coverImage);
+          coverImage.getViewTreeObserver().removeOnPreDrawListener(this);
+
+          CoverUtil.withContext(new Supplier<Context>() {
+            @Override
+            public Context get() {
+              return author.getContext();
+            }
+          })
+              .withBook(book)
+              .loadInto(coverImage);
           return true;
         }
       });
