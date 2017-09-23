@@ -37,6 +37,9 @@
   <string name="preference_server_settings_endpoint_login_title">Login endpoint path</string>
   <string name="preference_server_settings_endpoint_login_summary">The login path on the server is \'%s\'.</string>
 
+  <string name="preference_server_settings_endpoint_modify_title">Modify endpoint path</string>
+  <string name="preference_server_settings_endpoint_modify_summary">The modify path on the server is \'%s\'.</string>
+
   <string name="preference_server_settings_account_username_title">Username</string>
   <string name="preference_server_settings_account_username_summary">The selected username is \'%s\'.</string>
   <string name="preference_server_settings_account_password_title">Password</string>

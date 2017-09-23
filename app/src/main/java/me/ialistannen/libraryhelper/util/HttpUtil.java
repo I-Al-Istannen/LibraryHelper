@@ -165,7 +165,8 @@ public class HttpUtil {
     DELETE("delete"),
     COVER("cover"),
     LENDING("lending"),
-    LOGIN("login");
+    LOGIN("login"),
+    MODIFY("modify");
 
     private final String preferenceKey;
 
