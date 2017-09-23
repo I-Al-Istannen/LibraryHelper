@@ -2,18 +2,27 @@ package me.ialistannen.libraryhelper.view.booklist;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.Collections;
@@ -104,7 +113,7 @@ public class BookDetailList extends RecyclerView {
    *
    * @param contextMenuCreator The {@link ContextMenuCreator} to use
    */
-  public void setContextMenuCreator(ContextMenuCreator contextMenuCreator) {
+  void setContextMenuCreator(ContextMenuCreator contextMenuCreator) {
     this.contextMenuCreator = contextMenuCreator;
   }
 
@@ -122,7 +131,7 @@ public class BookDetailList extends RecyclerView {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
       final BookDetailViewHolder detailViewHolder = (BookDetailViewHolder) holder;
       detailViewHolder.setData(data.get(position));
 
@@ -144,11 +153,20 @@ public class BookDetailList extends RecyclerView {
             new OnCreateContextMenuListener() {
               @Override
               public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-                int childAdapterPosition = getChildAdapterPosition(
+                final int childAdapterPosition = getChildAdapterPosition(
                     detailViewHolder.getRootLayout()
                 );
                 Pair<String, String> item = data.get(childAdapterPosition);
                 contextMenuCreator.onCreateContextMenu(item, menu, v, menuInfo);
+
+                menu.add("Edit").setOnMenuItemClickListener(new OnMenuItemClickListener() {
+                  @Override
+                  public boolean onMenuItemClick(MenuItem item) {
+                    detailViewHolder.startEditing();
+                    scrollToPosition(childAdapterPosition);
+                    return true;
+                  }
+                });
               }
             });
       }
@@ -179,6 +197,9 @@ public class BookDetailList extends RecyclerView {
     @BindView(R.id.text_view_value)
     TextView value;
 
+    @BindView(R.id.text_view_value_editor)
+    EditText valueEditor;
+
     BookDetailViewHolder(View itemView) {
       super(itemView);
 
@@ -192,6 +213,51 @@ public class BookDetailList extends RecyclerView {
     void setData(Pair<String, String> data) {
       key.setText(data.getKey());
       value.setText(data.getValue());
+    }
+
+    void startEditing() {
+      valueEditor.setText(value.getText());
+      valueEditor.setVisibility(VISIBLE);
+      value.setVisibility(GONE);
+
+      valueEditor.setRawInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+      valueEditor.setOnEditorActionListener(new OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+          stopEditing();
+          showKeyboard(false);
+          return true;
+        }
+      });
+
+      new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          showKeyboard(true);
+        }
+      }, 500); // screw you. If I have to wait for focus, why not just one tick?
+      valueEditor.requestFocus();
+    }
+
+    private void showKeyboard(boolean show) {
+      InputMethodManager inputMethodManager = (InputMethodManager) valueEditor.getContext()
+          .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+      if (show) {
+        inputMethodManager.showSoftInput(
+            valueEditor, InputMethodManager.SHOW_IMPLICIT
+        );
+      } else {
+        inputMethodManager.hideSoftInputFromWindow(
+            valueEditor.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS
+        );
+      }
+    }
+
+    void stopEditing() {
+      valueEditor.setVisibility(GONE);
+      value.setVisibility(VISIBLE);
+      value.setText(valueEditor.getText());
     }
   }
 

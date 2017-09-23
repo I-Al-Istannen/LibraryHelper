@@ -36,8 +36,6 @@ class CoverUtil {
   private static LruCache<String, Bitmap> coverCache = new LruCache<String, Bitmap>(CACHE_SIZE) {
     @Override
     protected int sizeOf(String key, Bitmap value) {
-      System.out.println(key + " has size " + value.getByteCount());
-      System.out.println("Cache size: " + CACHE_SIZE);
       return value.getByteCount();
     }
   };
