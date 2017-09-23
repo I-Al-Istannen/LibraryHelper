@@ -14,7 +14,8 @@ public enum SearchType {
   TITLE_WILDCARD("title_wildcard", R.string.search_type_title_wildcard_name),
   TITLE_REGEX("title_regex", R.string.search_type_title_regex_name),
   TITLE_MATCH("title_match", R.string.search_type_title_match_name),
-  AUTHOR_WILDCARD("author_wildcard", R.string.search_type_author_wildcard_name);
+  AUTHOR_WILDCARD("author_wildcard", R.string.search_type_author_wildcard_name),
+  LOCATION_MATCH("location_match", R.string.search_type_location_match_name);
 
   private String value;
   private final int displayName;
