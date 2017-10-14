@@ -66,12 +66,14 @@
   <string name="delete_fragment_server_refused_deletion">Server said no.</string>
 
   <string name="fragment_query_execute_button_text">Execute!</string>
-  <string name="search_type_isbn_name">Isbn</string>
-  <string name="search_type_title_wildcard_name">Title with Wildcards</string>
-  <string name="search_type_title_regex_name">Title with regular expressions</string>
-  <string name="search_type_author_wildcard_name">Author with Wildcards</string>
-  <string name="search_type_title_match_name">Title fuzzy match (phrase or single word)</string>
-  <string name="search_type_location_match_name">Location match</string>
+  <string name="query_field_isbn_name">ISBN</string>
+  <string name="query_field_title_name">Title</string>
+  <string name="query_field_author_name">Author</string>
+  <string name="query_field_location_name">Location</string>
+  <string name="search_type_wildcard_name">Wildcard</string>
+  <string name="search_type_regex_name">Regular Expression</string>
+  <string name="search_type_exact_match_name">Exact match</string>
+  <string name="search_type_fuzzy_name">Fuzzy match</string>
   <string name="fragment_query_input_hint">Query…</string>
 
   <string name="lend_fragment_received_book_back">Successfully removed the borrower.</string>

@@ -6,19 +6,19 @@ import com.google.common.base.Function;
 import me.ialistannen.libraryhelper.R;
 
 /**
- * The different possible search types.
+ * A field you can query
  */
 @SuppressWarnings("unused") // The fields are dynamically matched.
-public enum SearchType {
-  WILDCARD("wildcard", R.string.search_type_wildcard_name),
-  REGEX("regex", R.string.search_type_regex_name),
-  EXACT_MATCH("exact_match", R.string.search_type_exact_match_name),
-  FUZZY("fuzzy", R.string.search_type_fuzzy_name);
+public enum QueryField {
+  ISBN("isbn", R.string.query_field_isbn_name),
+  TITLE("title", R.string.query_field_title_name),
+  AUTHOR("author", R.string.query_field_author_name),
+  LOCATION("location", R.string.query_field_location_name);
 
   private String value;
   private final int displayName;
 
-  SearchType(String value, @StringRes int displayName) {
+  QueryField(String value, @StringRes int displayName) {
     this.value = value;
     this.displayName = displayName;
   }
@@ -36,12 +36,13 @@ public enum SearchType {
    * @param context The context to use to resolve {@link #getDisplayNameId()}
    * @return A function transforming a {@link SearchType} to its display name
    */
-  public static Function<SearchType, String> transformToDisplayName(final Context context) {
-    return new Function<SearchType, String>() {
+  public static Function<QueryField, String> transformToDisplayName(final Context context) {
+    return new Function<QueryField, String>() {
       @Override
-      public String apply(SearchType searchType) {
-        return context.getString(searchType.getDisplayNameId());
+      public String apply(QueryField queryField) {
+        return context.getString(queryField.getDisplayNameId());
       }
     };
   }
+
 }

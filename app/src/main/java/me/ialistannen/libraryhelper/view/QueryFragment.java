@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import me.ialistannen.libraryhelper.R;
 import me.ialistannen.libraryhelper.logic.query.BookExtractorServerCallback;
+import me.ialistannen.libraryhelper.logic.query.QueryField;
 import me.ialistannen.libraryhelper.logic.query.QueryTarget;
 import me.ialistannen.libraryhelper.logic.query.SearchType;
 import me.ialistannen.libraryhelper.util.EnumUtil;
@@ -40,6 +41,9 @@ public class QueryFragment extends FragmentBase {
   @BindView(R.id.query_type)
   Spinner queryType;
 
+  @BindView(R.id.query_field)
+  Spinner queryField;
+
   @BindView(R.id.query_input)
   EditText queryInput;
 
@@ -47,6 +51,7 @@ public class QueryFragment extends FragmentBase {
   Button executeButton;
 
   private Map<String, SearchType> searchTypeMapping;
+  private Map<String, QueryField> queryFieldMapping;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,34 +75,43 @@ public class QueryFragment extends FragmentBase {
   }
 
   private void setupSpinner() {
-    Function<SearchType, String> transformation = SearchType.transformToDisplayName(
+    Function<SearchType, String> transformationSearch = SearchType.transformToDisplayName(
+        getFragmentHolderActivity()
+    );
+    Function<QueryField, String> transformationQuery = QueryField.transformToDisplayName(
         getFragmentHolderActivity()
     );
 
-    searchTypeMapping = EnumUtil.getReverseMapping(SearchType.class, transformation);
+    searchTypeMapping = EnumUtil.getReverseMapping(SearchType.class, transformationSearch);
+    queryFieldMapping = EnumUtil.getReverseMapping(QueryField.class, transformationQuery);
 
-    List<String> items = EnumUtil.transformEnum(SearchType.class, transformation);
+    setSpinnerAdapter(EnumUtil.transformEnum(SearchType.class, transformationSearch), queryType);
+    setSpinnerAdapter(EnumUtil.transformEnum(QueryField.class, transformationQuery), queryField);
+  }
 
+  private void setSpinnerAdapter(List<String> items, Spinner spinner) {
     ArrayAdapter<String> adapter = new ArrayAdapter<>(
         getFragmentHolderActivity(),
         android.R.layout.simple_spinner_item,
         items
     );
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    queryType.setAdapter(adapter);
+    spinner.setAdapter(adapter);
   }
 
 
   @OnClick(R.id.execute_query_button)
   void onExecuteQuery() {
-    String selectedItem = (String) queryType.getSelectedItem();
-    if (selectedItem == null) {
+    String selectedSearchItem = (String) queryType.getSelectedItem();
+    String selectedQueryItem = (String) queryField.getSelectedItem();
+    if (selectedSearchItem == null || selectedQueryItem == null) {
       return;
     }
-    SearchType searchType = searchTypeMapping.get(selectedItem);
+    SearchType searchType = searchTypeMapping.get(selectedSearchItem);
+    QueryField queryField = queryFieldMapping.get(selectedQueryItem);
 
-    if (searchType != null) {
-      performQuery(searchType, queryInput.getText().toString());
+    if (searchType != null && queryField != null) {
+      performQuery(searchType, queryField, queryInput.getText().toString());
     }
   }
 
@@ -132,17 +146,18 @@ public class QueryFragment extends FragmentBase {
       return;
     }
 
-    queryType.setSelection(SearchType.ISBN.ordinal());
+    queryType.setSelection(SearchType.EXACT_MATCH.ordinal());
+    queryField.setSelection(QueryField.ISBN.ordinal());
     queryInput.setText(isbnString);
-    performQuery(SearchType.ISBN, isbnString);
+    performQuery(SearchType.EXACT_MATCH, QueryField.ISBN, isbnString);
   }
 
-  private void performQuery(SearchType searchType, String argument) {
+  private void performQuery(SearchType searchType, QueryField field, String argument) {
     showWaitingSpinner(true);
 
     QueryTarget queryTarget = HttpUtil.getTargetFromSettings(getFragmentHolderActivity());
 
-    Request request = getRequestForQuery(queryTarget, searchType, argument);
+    Request request = getRequestForQuery(queryTarget, searchType, field, argument);
 
     HttpUtil.makeCall(request, getActivity(),
         new BookExtractorServerCallback(
@@ -181,14 +196,19 @@ public class QueryFragment extends FragmentBase {
   /**
    * @param target The target of the query
    * @param searchType The search type
+   * @param queryField The field to search for
    * @param data The data to send
    * @return The {@link HttpUrl} for it.
    */
-  private Request getRequestForQuery(QueryTarget target, SearchType searchType, String data) {
+  private Request getRequestForQuery(QueryTarget target, SearchType searchType,
+      QueryField queryField, String data) {
     HttpUrl url = target.getUrl().newBuilder()
         .setQueryParameter("search_type", searchType.getValue())
+        .setQueryParameter("field", queryField.getValue())
         .setQueryParameter("query", data)
         .build();
+
+    System.out.println("Query is: " + url);
 
     return new Request.Builder()
         .url(url)
