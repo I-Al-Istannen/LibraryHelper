@@ -52,6 +52,13 @@ public class HttpUtil {
    * @param callback The {@link Callback} to invoke
    */
   public static void makeCall(Request request, Context context, final Callback callback) {
+    // bypass auth checking when not needed, as we do not want to leak the token
+    // or wait for us to be authenticated
+    if (!needsAuthentication(request.url(), context)) {
+      getClient().newCall(request).enqueue(callback);
+      return;
+    }
+
     // We need to execute them, but first wait to get the token
     if (fetchingToken) {
       callbackQueue.add(new DelayedCallback(context, request, callback));
@@ -90,6 +97,12 @@ public class HttpUtil {
         .header("Authorization", "Bearer " + token.get().getToken())
         .build();
     getClient().newCall(newRequest).enqueue(callback);
+  }
+
+  private static boolean needsAuthentication(HttpUrl url, Context context) {
+    return url.host().equalsIgnoreCase(
+        getServerUrlFromSettings(context, EndpointType.SEARCH).host()
+    );
   }
 
   /**
